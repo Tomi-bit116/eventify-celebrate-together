@@ -6,7 +6,6 @@ import { Navbar } from '@/components/Navbar';
 import { AuthModal } from '@/components/AuthModal';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
-import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { CTASection } from '@/components/landing/CTASection';
 
 const Index = () => {
@@ -51,8 +50,6 @@ const Index = () => {
       />
       
       <FeaturesSection />
-      
-      <TestimonialsSection />
       
       <CTASection onShowAuth={() => setShowAuth(true)} />
 

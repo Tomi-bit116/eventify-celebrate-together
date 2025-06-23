@@ -2,22 +2,22 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
-  Calendar, 
-  CheckCircle, 
+  Plus, 
   Users, 
   DollarSign, 
-  Plus, 
+  CheckCircle, 
+  BarChart3,
+  ArrowRight,
+  Sparkles,
+  Calendar,
   MessageSquare,
-  BookOpen,
-  Settings,
-  Heart,
-  Sparkles
+  BookOpen
 } from 'lucide-react';
-import { FeatureCard } from './dashboard/FeatureCard';
+import { WorkflowStep } from './dashboard/WorkflowStep';
 
 export const Dashboard = () => {
-  const handleFeatureClick = (feature: string) => {
-    console.log(`Navigating to ${feature}`);
+  const handleStepClick = (step: string) => {
+    console.log(`Starting step: ${step}`);
     // Navigation logic will be implemented later
   };
 
@@ -26,163 +26,186 @@ export const Dashboard = () => {
     // Event creation logic will be implemented later
   };
 
-  const features = [
+  const workflowSteps = [
+    {
+      id: 'create',
+      title: "Create Event",
+      description: "Start by setting up your event details and theme",
+      icon: Plus,
+      color: "bg-gradient-to-br from-coral-500 to-pink-500",
+      hoverColor: "hover:from-coral-600 hover:to-pink-600",
+      status: "ready",
+      step: 1
+    },
+    {
+      id: 'guests',
+      title: "Invite Guests",
+      description: "Build your guest list and send out invitations",
+      icon: Users,
+      color: "bg-gradient-to-br from-blue-500 to-indigo-500",
+      hoverColor: "hover:from-blue-600 hover:to-indigo-600",
+      status: "pending",
+      step: 2
+    },
+    {
+      id: 'budget',
+      title: "Manage Budget",
+      description: "Track expenses and stay within your spending limits",
+      icon: DollarSign,
+      color: "bg-gradient-to-br from-emerald-500 to-teal-500",
+      hoverColor: "hover:from-emerald-600 hover:to-teal-600",
+      status: "pending",
+      step: 3
+    },
+    {
+      id: 'tasks',
+      title: "Track Tasks",
+      description: "Organize your to-do list and never miss a detail",
+      icon: CheckCircle,
+      color: "bg-gradient-to-br from-purple-500 to-violet-500",
+      hoverColor: "hover:from-purple-600 hover:to-violet-600",
+      status: "pending",
+      step: 4
+    },
+    {
+      id: 'analytics',
+      title: "View Analytics",
+      description: "Monitor progress and see how your event is shaping up",
+      icon: BarChart3,
+      color: "bg-gradient-to-br from-orange-500 to-red-500",
+      hoverColor: "hover:from-orange-600 hover:to-red-600",
+      status: "locked",
+      step: 5
+    }
+  ];
+
+  const quickActions = [
     {
       icon: Calendar,
       title: "My Events",
-      description: "View and manage all your upcoming celebrations",
-      color: "bg-gradient-to-br from-coral-400 to-coral-500",
-      id: "events"
-    },
-    {
-      icon: CheckCircle,
-      title: "Tasks",
-      description: "Keep track of everything on your to-do list",
-      color: "bg-gradient-to-br from-emerald-400 to-emerald-500",
-      id: "tasks"
-    },
-    {
-      icon: DollarSign,
-      title: "Budget",
-      description: "Track expenses and stay within your budget",
-      color: "bg-gradient-to-br from-gold-400 to-yellow-500",
-      id: "budget"
-    },
-    {
-      icon: Users,
-      title: "Guest List",
-      description: "Manage invitations and track RSVPs",
-      color: "bg-gradient-to-br from-blue-400 to-blue-500",
-      id: "guests"
+      description: "View all your celebrations",
+      color: "bg-gradient-to-br from-rose-400 to-pink-400"
     },
     {
       icon: MessageSquare,
       title: "Vendors",
-      description: "Connect with trusted event service providers",
-      color: "bg-gradient-to-br from-purple-400 to-purple-500",
-      id: "vendors"
+      description: "Connect with service providers",
+      color: "bg-gradient-to-br from-cyan-400 to-blue-400"
     },
     {
       icon: BookOpen,
       title: "Templates",
-      description: "Get started with pre-made event templates",
-      color: "bg-gradient-to-br from-teal-400 to-teal-500",
-      id: "templates"
+      description: "Pre-made event templates",
+      color: "bg-gradient-to-br from-amber-400 to-orange-400"
     }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-orange-50 to-yellow-50 p-4">
       {/* Header */}
-      <div className="max-w-6xl mx-auto mb-8">
-        <div className="text-center mb-8">
+      <div className="max-w-7xl mx-auto mb-8">
+        <div className="text-center mb-12">
           <div className="text-6xl mb-4 animate-bounce-gentle">🎉</div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Welcome to Eventify!
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            Welcome back, Event Planner! ✨
           </h1>
-          <p className="text-lg text-gray-600 mb-6">
-            Your friendly event planning companion is here to help! ✨
+          <p className="text-xl text-gray-600 mb-8">
+            Let's make your next celebration unforgettable. Follow the workflow below to get started! 🚀
           </p>
-          
-          <Button 
-            onClick={handleCreateEvent}
-            className="bg-gradient-to-r from-coral-500 to-pink-500 hover:from-coral-600 hover:to-pink-600 text-white rounded-full px-8 py-4 text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-          >
-            <Plus className="w-6 h-6 mr-2" />
-            Create Your First Event 🚀
-          </Button>
         </div>
       </div>
 
-      {/* Features Grid */}
-      <div className="max-w-6xl mx-auto mb-8">
+      {/* Workflow Steps */}
+      <div className="max-w-7xl mx-auto mb-12">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">
-            Everything you need to plan amazing events 💫
+          <h2 className="text-3xl font-bold text-gray-800 mb-3">
+            Your Event Planning Journey 🛤️
           </h2>
-          <p className="text-gray-600">
-            Tap any feature below to explore what Eventify can do for you!
+          <p className="text-gray-600 text-lg">
+            Follow these steps to create the perfect celebration, one stage at a time!
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {features.map((feature) => (
-            <FeatureCard
-              key={feature.id}
-              icon={feature.icon}
-              title={feature.title}
-              description={feature.description}
-              color={feature.color}
-              onClick={() => handleFeatureClick(feature.id)}
-            />
+        {/* Workflow Grid */}
+        <div className="relative">
+          {/* Connection Lines for Desktop */}
+          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 transform -translate-y-1/2 z-0"></div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 relative z-10">
+            {workflowSteps.map((step, index) => (
+              <div key={step.id} className="relative">
+                <WorkflowStep
+                  {...step}
+                  onClick={() => handleStepClick(step.id)}
+                />
+                
+                {/* Arrow for mobile */}
+                {index < workflowSteps.length - 1 && (
+                  <div className="flex justify-center mt-4 mb-4 lg:hidden">
+                    <ArrowRight className="w-6 h-6 text-gray-400" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="max-w-7xl mx-auto mb-12">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">
+            Quick Actions 🚀
+          </h2>
+          <p className="text-gray-600">
+            Jump to any feature you need right now!
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {quickActions.map((action, index) => (
+            <Card 
+              key={index}
+              className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 border-0 shadow-lg group"
+              onClick={() => handleStepClick(action.title.toLowerCase().replace(' ', ''))}
+            >
+              <CardContent className="p-6 text-center">
+                <div className={`w-16 h-16 mx-auto rounded-full ${action.color} flex items-center justify-center mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300`}>
+                  <action.icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-semibold text-lg text-gray-800 mb-2 group-hover:text-gray-900 transition-colors">
+                  {action.title}
+                </h3>
+                <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors">
+                  {action.description}
+                </p>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
 
       {/* Demo Section */}
-      <div className="max-w-4xl mx-auto mb-8">
-        <Card className="bg-gradient-to-br from-violet-50 to-pink-50 border-violet-200 shadow-lg">
+      <div className="max-w-5xl mx-auto mb-8">
+        <Card className="bg-gradient-to-br from-violet-50 to-pink-50 border-violet-200 shadow-xl">
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center space-x-2 text-violet-800">
-              <Sparkles className="w-6 h-6" />
-              <span>Want to see Eventify in action?</span>
+              <Sparkles className="w-7 h-7" />
+              <span className="text-2xl">Ready to see magic happen? ✨</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center">
-            <p className="text-violet-700 mb-6">
-              Check out our demo event to see all the amazing features working together! 
+            <p className="text-violet-700 mb-8 text-lg">
+              Explore our demo event to see all the amazing features working together! 
+              Perfect for getting familiar with the workflow before creating your own celebration.
             </p>
             <Button 
-              onClick={() => handleFeatureClick('demo')}
-              variant="outline"
-              className="border-violet-300 text-violet-700 hover:bg-violet-100 px-6 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+              onClick={() => handleStepClick('demo')}
+              className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
             >
-              <Calendar className="w-5 h-5 mr-2" />
-              Explore Demo Event ✨
+              <Calendar className="w-6 h-6 mr-2" />
+              Explore Demo Event 🎊
             </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Getting Started Tips */}
-      <div className="max-w-4xl mx-auto">
-        <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-emerald-800">
-              <Heart className="w-6 h-6" />
-              <span>Getting Started Tips</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <span className="text-2xl">🎯</span>
-                <div>
-                  <h4 className="font-semibold text-emerald-800">Start with a template</h4>
-                  <p className="text-sm text-emerald-700">
-                    Save time by using our pre-made event templates for birthdays, weddings, and more!
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <span className="text-2xl">👥</span>
-                <div>
-                  <h4 className="font-semibold text-emerald-800">Invite your squad</h4>
-                  <p className="text-sm text-emerald-700">
-                    Planning is more fun together! Invite friends and family to help you organize.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <span className="text-2xl">📱</span>
-                <div>
-                  <h4 className="font-semibold text-emerald-800">Share via WhatsApp</h4>
-                  <p className="text-sm text-emerald-700">
-                    Easily share updates, guest lists, and event details with your WhatsApp groups.
-                  </p>
-                </div>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
