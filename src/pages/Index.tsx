@@ -1,13 +1,43 @@
-
 import { useState } from 'react';
+import { OnboardingFlow } from '@/components/OnboardingFlow';
+import { Dashboard } from '@/components/Dashboard';
+import { Navbar } from '@/components/Navbar';
+import { AuthModal } from '@/components/AuthModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Users, CheckCircle, DollarSign, Star, Heart, Zap } from 'lucide-react';
-import { AuthModal } from '@/components/AuthModal';
-import { Navbar } from '@/components/Navbar';
 
 const Index = () => {
   const [showAuth, setShowAuth] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+
+  const handleGetStarted = () => {
+    setShowOnboarding(true);
+  };
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    setShowDashboard(true);
+  };
+
+  const handleBackToLanding = () => {
+    setShowOnboarding(false);
+    setShowDashboard(false);
+  };
+
+  if (showDashboard) {
+    return <Dashboard />;
+  }
+
+  if (showOnboarding) {
+    return (
+      <OnboardingFlow
+        onComplete={handleOnboardingComplete}
+        onBack={handleBackToLanding}
+      />
+    );
+  }
 
   const features = [
     {
@@ -55,13 +85,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-orange-50 to-yellow-50">
-      <Navbar onGetStarted={() => setShowAuth(true)} />
+      <Navbar onGetStarted={handleGetStarted} />
       
       {/* Hero Section */}
       <section className="pt-20 pb-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <div className="animate-bounce mb-8">
-            <span className="text-6xl">🎉</span>
+            <span className="text-6xl">🎯</span>
+            <span className="text-2xl animate-wiggle">✨</span>
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-coral-600 via-emerald-500 to-blue-600 bg-clip-text text-transparent animate-fade-in">
@@ -74,7 +105,7 @@ const Index = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button 
-              onClick={() => setShowAuth(true)}
+              onClick={handleGetStarted}
               className="bg-gradient-to-r from-coral-500 to-pink-500 hover:from-coral-600 hover:to-pink-600 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 animate-pulse"
             >
               Let's plan something amazing! 🚀

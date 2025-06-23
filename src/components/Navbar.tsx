@@ -10,11 +10,17 @@ export const Navbar = ({ onGetStarted }: NavbarProps) => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-orange-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-2">
-            <span className="text-2xl">🎉</span>
-            <span className="text-2xl font-bold bg-gradient-to-r from-coral-600 to-pink-600 bg-clip-text text-transparent">
-              Eventify
-            </span>
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <span className="text-3xl animate-bounce-gentle">🎯</span>
+              <span className="absolute -top-1 -right-1 text-lg animate-wiggle">✨</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold bg-gradient-to-r from-coral-600 to-pink-600 bg-clip-text text-transparent">
+                Eventify
+              </span>
+              <span className="text-xs text-gray-500 -mt-1">Your party planning bestie</span>
+            </div>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
