@@ -34,7 +34,7 @@ export const Dashboard = () => {
       icon: Plus,
       color: "bg-gradient-to-br from-coral-500 to-pink-500",
       hoverColor: "hover:from-coral-600 hover:to-pink-600",
-      status: "ready",
+      status: "ready" as const,
       step: 1
     },
     {
@@ -44,7 +44,7 @@ export const Dashboard = () => {
       icon: Users,
       color: "bg-gradient-to-br from-blue-500 to-indigo-500",
       hoverColor: "hover:from-blue-600 hover:to-indigo-600",
-      status: "pending",
+      status: "pending" as const,
       step: 2
     },
     {
@@ -54,7 +54,7 @@ export const Dashboard = () => {
       icon: DollarSign,
       color: "bg-gradient-to-br from-emerald-500 to-teal-500",
       hoverColor: "hover:from-emerald-600 hover:to-teal-600",
-      status: "pending",
+      status: "pending" as const,
       step: 3
     },
     {
@@ -64,7 +64,7 @@ export const Dashboard = () => {
       icon: CheckCircle,
       color: "bg-gradient-to-br from-purple-500 to-violet-500",
       hoverColor: "hover:from-purple-600 hover:to-violet-600",
-      status: "pending",
+      status: "pending" as const,
       step: 4
     },
     {
@@ -74,7 +74,7 @@ export const Dashboard = () => {
       icon: BarChart3,
       color: "bg-gradient-to-br from-orange-500 to-red-500",
       hoverColor: "hover:from-orange-600 hover:to-red-600",
-      status: "locked",
+      status: "locked" as const,
       step: 5
     }
   ];
