@@ -7,21 +7,21 @@ import {
   Users, 
   DollarSign, 
   CheckCircle, 
-  BarChart3,
   Calendar,
   MessageSquare,
   CheckSquare,
-  Upload,
   Settings,
   HelpCircle,
   Menu,
   X,
   Clock,
-  Camera,
   Sparkles,
   Heart,
-  Crown,
-  UserCheck
+  UserCheck,
+  UserPlus,
+  MessageCircle,
+  FileTemplate,
+  BookOpen
 } from 'lucide-react';
 import { CreateEventModal } from './dashboard/CreateEventModal';
 import { ProgressTracker } from './dashboard/ProgressTracker';
@@ -29,6 +29,11 @@ import { LanguageToggle } from './dashboard/LanguageToggle';
 import { InviteGuestsPage } from './dashboard/InviteGuestsPage';
 import { BudgetPage } from './dashboard/BudgetPage';
 import { RSVPPage } from './dashboard/RSVPPage';
+import { SharedAccessPage } from './dashboard/SharedAccessPage';
+import { WhatsAppIntegrationPage } from './dashboard/WhatsAppIntegrationPage';
+import { EventTemplatesPage } from './dashboard/EventTemplatesPage';
+import { TaskChecklistPage } from './dashboard/TaskChecklistPage';
+import { VendorContactBookPage } from './dashboard/VendorContactBookPage';
 
 export const Dashboard = () => {
   const [currentEvent, setCurrentEvent] = useState(null);
@@ -36,7 +41,7 @@ export const Dashboard = () => {
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'dashboard' | 'invite' | 'budget' | 'rsvp' | 'media' | 'tasks' | 'vendors' | 'analytics'>('dashboard');
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'invite' | 'budget' | 'rsvp' | 'shared-access' | 'whatsapp' | 'templates' | 'tasks' | 'vendors'>('dashboard');
 
   const handleEventCreated = (eventData: any) => {
     setCurrentEvent(eventData);
@@ -57,24 +62,27 @@ export const Dashboard = () => {
       case 'track-rsvps':
         setCurrentPage('rsvp');
         break;
-      case 'upload-media':
-        setCurrentPage('media');
+      case 'shared-access':
+        setCurrentPage('shared-access');
+        break;
+      case 'whatsapp-integration':
+        setCurrentPage('whatsapp');
+        break;
+      case 'event-templates':
+        setCurrentPage('templates');
         break;
       case 'task-checklist':
         setCurrentPage('tasks');
         break;
-      case 'vendor-booking':
+      case 'vendor-contact-book':
         setCurrentPage('vendors');
-        break;
-      case 'analytics':
-        setCurrentPage('analytics');
         break;
       default:
         console.log(`Feature ${feature} not implemented yet`);
     }
   };
 
-  // If we're on a different page, render that page
+  // Page routing
   if (currentPage === 'invite') {
     return <InviteGuestsPage onBack={() => setCurrentPage('dashboard')} />;
   }
@@ -87,13 +95,33 @@ export const Dashboard = () => {
     return <RSVPPage onBack={() => setCurrentPage('dashboard')} />;
   }
 
+  if (currentPage === 'shared-access') {
+    return <SharedAccessPage onBack={() => setCurrentPage('dashboard')} />;
+  }
+
+  if (currentPage === 'whatsapp') {
+    return <WhatsAppIntegrationPage onBack={() => setCurrentPage('dashboard')} />;
+  }
+
+  if (currentPage === 'templates') {
+    return <EventTemplatesPage onBack={() => setCurrentPage('dashboard')} />;
+  }
+
+  if (currentPage === 'tasks') {
+    return <TaskChecklistPage onBack={() => setCurrentPage('dashboard')} />;
+  }
+
+  if (currentPage === 'vendors') {
+    return <VendorContactBookPage onBack={() => setCurrentPage('dashboard')} />;
+  }
+
   const mainFeatures = [
     {
       id: 'create-event',
       title: "Create New Event",
       description: "Start planning your celebration",
       icon: Plus,
-      color: "bg-gradient-to-br from-emerald-500 to-teal-600",
+      color: "bg-gradient-to-br from-lime-500 to-green-600",
       onClick: () => setShowCreateModal(true)
     },
     {
@@ -101,7 +129,7 @@ export const Dashboard = () => {
       title: "Invite Guests",
       description: "Build your guest list and send invitations",
       icon: Users,
-      color: "bg-gradient-to-br from-blue-500 to-indigo-600",
+      color: "bg-gradient-to-br from-yellow-500 to-lime-600",
       onClick: () => handleFeatureClick('invite-guests')
     },
     {
@@ -109,7 +137,7 @@ export const Dashboard = () => {
       title: "Budget Tracker",
       description: "Monitor expenses and stay on track",
       icon: DollarSign,
-      color: "bg-gradient-to-br from-amber-500 to-orange-600",
+      color: "bg-gradient-to-br from-green-500 to-emerald-600",
       onClick: () => handleFeatureClick('manage-budget')
     },
     {
@@ -117,40 +145,48 @@ export const Dashboard = () => {
       title: "Track RSVPs",
       description: "Monitor guest responses",
       icon: UserCheck,
-      color: "bg-gradient-to-br from-purple-500 to-violet-600",
+      color: "bg-gradient-to-br from-lime-500 to-yellow-600",
       onClick: () => handleFeatureClick('track-rsvps')
+    },
+    {
+      id: 'shared-access',
+      title: "Shared Access",
+      description: "Add co-hosts and collaborators",
+      icon: UserPlus,
+      color: "bg-gradient-to-br from-yellow-500 to-green-600",
+      onClick: () => handleFeatureClick('shared-access')
+    },
+    {
+      id: 'whatsapp-integration',
+      title: "WhatsApp Integration",
+      description: "Share updates via WhatsApp",
+      icon: MessageCircle,
+      color: "bg-gradient-to-br from-green-500 to-lime-600",
+      onClick: () => handleFeatureClick('whatsapp-integration')
+    },
+    {
+      id: 'event-templates',
+      title: "Event Templates",
+      description: "Pre-built templates for quick setup",
+      icon: FileTemplate,
+      color: "bg-gradient-to-br from-lime-500 to-emerald-600",
+      onClick: () => handleFeatureClick('event-templates')
     },
     {
       id: 'task-checklist',
       title: "Task Checklist",
-      description: "Organize your to-do items",
+      description: "Track progress with deadlines",
       icon: CheckSquare,
-      color: "bg-gradient-to-br from-teal-500 to-cyan-600",
+      color: "bg-gradient-to-br from-yellow-500 to-lime-600",
       onClick: () => handleFeatureClick('task-checklist')
     },
     {
-      id: 'upload-media',
-      title: "Event Media",
-      description: "Upload photos and banners",
-      icon: Upload,
-      color: "bg-gradient-to-br from-pink-500 to-rose-600",
-      onClick: () => handleFeatureClick('upload-media')
-    },
-    {
-      id: 'vendor-booking',
-      title: "Vendor Booking",
-      description: "Connect with service providers",
-      icon: MessageSquare,
-      color: "bg-gradient-to-br from-indigo-500 to-blue-600",
-      onClick: () => handleFeatureClick('vendor-booking')
-    },
-    {
-      id: 'analytics',
-      title: "Event Analytics",
-      description: "View insights and metrics",
-      icon: BarChart3,
-      color: "bg-gradient-to-br from-red-500 to-pink-600",
-      onClick: () => handleFeatureClick('analytics')
+      id: 'vendor-contact-book',
+      title: "Vendor's Contact Book",
+      description: "Manage vendor details and payments",
+      icon: BookOpen,
+      color: "bg-gradient-to-br from-green-500 to-yellow-600",
+      onClick: () => handleFeatureClick('vendor-contact-book')
     }
   ];
 
@@ -159,27 +195,27 @@ export const Dashboard = () => {
       icon: Calendar,
       title: "My Events",
       description: "View all celebrations",
-      color: "bg-gradient-to-br from-rose-400 to-pink-400",
+      color: "bg-gradient-to-br from-lime-400 to-green-400",
       onClick: () => handleFeatureClick('my-events')
     },
     {
       icon: Clock,
       title: "Timeline",
       description: "Event planning timeline",
-      color: "bg-gradient-to-br from-cyan-400 to-blue-400",
+      color: "bg-gradient-to-br from-yellow-400 to-lime-400",
       onClick: () => handleFeatureClick('timeline')
     },
     {
-      icon: Camera,
-      title: "Gallery",
-      description: "Event memories",
-      color: "bg-gradient-to-br from-amber-400 to-orange-400",
-      onClick: () => handleFeatureClick('photo-gallery')
+      icon: Settings,
+      title: "Settings",
+      description: "App preferences",
+      color: "bg-gradient-to-br from-green-400 to-emerald-400",
+      onClick: () => handleFeatureClick('settings')
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-lime-50 to-green-50 relative overflow-hidden">
       {/* Subtle floating elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 text-2xl opacity-20 animate-pulse animation-delay-300">✨</div>
@@ -189,20 +225,20 @@ export const Dashboard = () => {
       </div>
 
       {/* Header with Menu Toggle */}
-      <div className="relative z-20 bg-white/95 backdrop-blur-sm shadow-lg border-b border-orange-100">
+      <div className="relative z-20 bg-white/95 backdrop-blur-sm shadow-lg border-b border-lime-100">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="lg:hidden bg-gradient-to-r from-orange-500 to-amber-500 text-white p-2"
+              className="lg:hidden bg-gradient-to-r from-yellow-500 to-lime-500 text-white p-2"
             >
               {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </Button>
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-lime-500 rounded-full flex items-center justify-center">
                 <span className="text-sm text-white">☀️</span>
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-lime-600 bg-clip-text text-transparent">
                 Dashboard
               </h1>
             </div>
@@ -213,7 +249,7 @@ export const Dashboard = () => {
             <Button
               variant="outline"
               onClick={() => handleFeatureClick('help')}
-              className="hidden md:flex items-center space-x-2 border border-orange-200 text-orange-700 hover:bg-orange-50"
+              className="hidden md:flex items-center space-x-2 border border-lime-200 text-green-700 hover:bg-lime-50"
             >
               <HelpCircle className="w-4 h-4" />
               <span>Help</span>
@@ -222,7 +258,7 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {/* Sliding Menu */}
+      {/* Mobile Sliding Menu */}
       <div className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 z-30 ${
         menuOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0 lg:relative lg:w-auto lg:shadow-none lg:bg-transparent`}>
@@ -242,7 +278,7 @@ export const Dashboard = () => {
                   feature.onClick();
                   setMenuOpen(false);
                 }}
-                className="w-full justify-start bg-gradient-to-r from-orange-50 to-amber-50 text-gray-800 hover:from-orange-100 hover:to-amber-100"
+                className="w-full justify-start bg-gradient-to-r from-yellow-50 to-lime-50 text-gray-800 hover:from-yellow-100 hover:to-lime-100"
               >
                 <feature.icon className="w-5 h-5 mr-3" />
                 {feature.title}
@@ -271,15 +307,6 @@ export const Dashboard = () => {
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             Your event planning dashboard is ready. Choose any feature below to continue creating your perfect celebration.
           </p>
-          
-          {/* Freemium Badge */}
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-200 rounded-full px-6 py-3 mb-4">
-            <Crown className="w-5 h-5 text-amber-600" />
-            <span className="font-medium text-amber-800">Free Plan Active</span>
-            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white ml-2">
-              Upgrade to Pro
-            </Button>
-          </div>
         </div>
 
         {/* Progress Tracker */}
@@ -296,16 +323,16 @@ export const Dashboard = () => {
         <div className="mb-12">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-3 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 mr-3 text-amber-500" />
+              <Sparkles className="w-6 h-6 mr-3 text-lime-500" />
               Event Planning Tools
-              <Sparkles className="w-6 h-6 ml-3 text-amber-500" />
+              <Sparkles className="w-6 h-6 ml-3 text-lime-500" />
             </h2>
             <p className="text-gray-600">
               Click any feature to get started with your celebration
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mainFeatures.map((feature) => (
               <Card 
                 key={feature.id}
@@ -332,9 +359,9 @@ export const Dashboard = () => {
         <div className="mb-12">
           <div className="text-center mb-8">
             <h2 className="text-xl font-bold text-gray-800 mb-3 flex items-center justify-center">
-              <Heart className="w-5 h-5 mr-2 text-red-500" />
+              <Heart className="w-5 h-5 mr-2 text-green-500" />
               Quick Access
-              <Heart className="w-5 h-5 ml-2 text-red-500" />
+              <Heart className="w-5 h-5 ml-2 text-green-500" />
             </h2>
             <p className="text-gray-600">
               Jump to your most-used features
@@ -366,7 +393,7 @@ export const Dashboard = () => {
 
         {/* Celebration Showcase */}
         <div className="mb-8">
-          <Card className="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 border-0 shadow-xl text-white">
+          <Card className="bg-gradient-to-r from-yellow-500 via-lime-500 to-green-500 border-0 shadow-xl text-white">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center space-x-2 text-white">
                 <span className="text-2xl">🎭</span>
