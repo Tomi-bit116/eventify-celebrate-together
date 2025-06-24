@@ -29,9 +29,9 @@ export const LanguageToggle = () => {
     <div className="relative">
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-gradient-to-r from-green-500 to-red-500 hover:from-green-600 hover:to-red-600 text-white flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+        className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white flex items-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"
       >
-        <Globe className="w-4 h-4 animate-spin-slow" />
+        <Globe className="w-4 h-4" />
         <span className="hidden md:inline">{currentLanguage?.flag}</span>
         <span className="hidden lg:inline">{currentLanguage?.name}</span>
       </Button>
@@ -45,10 +45,10 @@ export const LanguageToggle = () => {
           />
           
           {/* Language Menu */}
-          <Card className="absolute top-full right-0 mt-2 w-64 z-50 shadow-2xl border-2 border-gradient-to-r from-green-200 to-red-200 bg-white/95 backdrop-blur-sm">
+          <Card className="absolute top-full right-0 mt-2 w-64 z-50 shadow-xl border border-orange-200 bg-white/95 backdrop-blur-sm">
             <CardContent className="p-4">
               <div className="text-center mb-4">
-                <h3 className="font-bold text-lg text-gray-800">Choose Your Language</h3>
+                <h3 className="font-bold text-lg text-gray-800">Choose Language</h3>
                 <p className="text-sm text-gray-600">Select your preferred language</p>
               </div>
               
@@ -59,8 +59,8 @@ export const LanguageToggle = () => {
                     onClick={() => handleLanguageSelect(language.id)}
                     className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 hover:scale-105 ${
                       selectedLanguage === language.id
-                        ? 'bg-gradient-to-r from-green-100 to-red-100 border-2 border-green-300 shadow-lg'
-                        : 'hover:bg-gray-50 border-2 border-transparent'
+                        ? 'bg-gradient-to-r from-orange-100 to-amber-100 border border-orange-300 shadow-md'
+                        : 'hover:bg-orange-50 border border-transparent'
                     }`}
                   >
                     <div className="text-2xl">{language.flag}</div>
@@ -69,7 +69,7 @@ export const LanguageToggle = () => {
                       <div className="text-sm text-gray-600">{language.greeting}</div>
                     </div>
                     {selectedLanguage === language.id && (
-                      <Check className="w-5 h-5 text-green-600" />
+                      <Check className="w-5 h-5 text-orange-600" />
                     )}
                   </button>
                 ))}

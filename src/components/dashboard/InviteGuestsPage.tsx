@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Users, Phone, Mail, MessageSquare, Instagram, Share2, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Users, Phone, Mail, MessageSquare, Instagram, Share2, Plus, Trash2, Download } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Guest {
@@ -21,14 +21,14 @@ interface InviteGuestsPageProps {
 
 export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
   const [guests, setGuests] = useState<Guest[]>([
-    { id: '1', name: 'John Doe', phone: '+234 801 234 5678', email: 'john@example.com', status: 'confirmed' },
-    { id: '2', name: 'Jane Smith', phone: '+234 802 345 6789', email: 'jane@example.com', status: 'pending' },
+    { id: '1', name: 'Adunni Okafor', phone: '+234 801 234 5678', email: 'adunni@email.com', status: 'confirmed' },
+    { id: '2', name: 'Kemi Adeleke', phone: '+234 802 345 6789', email: 'kemi@email.com', status: 'pending' },
   ]);
   const [newGuest, setNewGuest] = useState({ name: '', phone: '', email: '' });
 
   const handleAddGuest = () => {
     if (!newGuest.name || !newGuest.phone) {
-      toast.error("Please fill in at least name and phone number!");
+      toast.error("Please provide at least a name and phone number");
       return;
     }
 
@@ -42,31 +42,41 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
 
     setGuests([...guests, guest]);
     setNewGuest({ name: '', phone: '', email: '' });
-    toast.success(`${newGuest.name} added to guest list! 🎉`);
+    toast.success(`${newGuest.name} added to your guest list!`);
   };
 
   const handleInviteViaWhatsApp = (guest: Guest) => {
-    const message = `Hi ${guest.name}! You're invited to our amazing celebration! 🎉 Can't wait to party with you!`;
+    const message = `Hi ${guest.name}! You're invited to our celebration! We'd love to have you join us for this special occasion. Please let us know if you can make it!`;
     const whatsappUrl = `https://wa.me/${guest.phone.replace(/\s+/g, '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
-    toast.success(`WhatsApp invitation sent to ${guest.name}! 📱`);
+    toast.success(`WhatsApp invitation sent to ${guest.name}`);
   };
 
   const handleInviteViaEmail = (guest: Guest) => {
-    const subject = "You're Invited to Our Celebration! 🎉";
-    const body = `Hi ${guest.name}!\n\nYou're invited to our amazing celebration! We can't wait to party with you!\n\nPlease RSVP as soon as possible.\n\nSee you there! 🥳`;
+    const subject = "You're Invited to Our Celebration!";
+    const body = `Dear ${guest.name},\n\nWe're excited to invite you to our upcoming celebration! Your presence would make this occasion even more special.\n\nPlease RSVP at your earliest convenience.\n\nLooking forward to celebrating with you!\n\nBest regards`;
     const emailUrl = `mailto:${guest.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(emailUrl);
-    toast.success(`Email invitation sent to ${guest.name}! 📧`);
+    toast.success(`Email invitation sent to ${guest.name}`);
   };
 
   const removeGuest = (id: string) => {
     setGuests(guests.filter(g => g.id !== id));
-    toast.success("Guest removed from list!");
+    toast.success("Guest removed from list");
+  };
+
+  const handleImportContacts = () => {
+    toast.success("Contact import feature coming soon!");
+  };
+
+  const handleCreateShareableLink = () => {
+    const link = `https://eventify.app/invite/${Date.now()}`;
+    navigator.clipboard.writeText(link);
+    toast.success("Shareable invitation link copied to clipboard!");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-red-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center mb-6">
           <Button onClick={onBack} variant="ghost" className="mr-4">
@@ -75,18 +85,18 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
           </Button>
           <div className="text-center flex-1">
             <h1 className="text-3xl font-bold text-gray-800 flex items-center justify-center">
-              <Users className="w-8 h-8 mr-3 text-green-600" />
-              Invite Your Squad! 🎉
+              <Users className="w-8 h-8 mr-3 text-orange-600" />
+              Invite Your Guests
             </h1>
-            <p className="text-gray-600 mt-2">Get everyone together for an amazing celebration!</p>
+            <p className="text-gray-600 mt-2">Build your guest list and send beautiful invitations</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Add New Guest */}
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="flex items-center text-green-700">
+              <CardTitle className="flex items-center text-orange-700">
                 <Plus className="w-5 h-5 mr-2" />
                 Add New Guest
               </CardTitle>
@@ -96,9 +106,10 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
                 <Label htmlFor="guestName">Guest Name *</Label>
                 <Input
                   id="guestName"
-                  placeholder="John Doe"
+                  placeholder="Enter guest name"
                   value={newGuest.name}
                   onChange={(e) => setNewGuest({...newGuest, name: e.target.value})}
+                  className="border-orange-200 focus:border-orange-400"
                 />
               </div>
               <div>
@@ -108,6 +119,7 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
                   placeholder="+234 801 234 5678"
                   value={newGuest.phone}
                   onChange={(e) => setNewGuest({...newGuest, phone: e.target.value})}
+                  className="border-orange-200 focus:border-orange-400"
                 />
               </div>
               <div>
@@ -115,19 +127,20 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
                 <Input
                   id="guestEmail"
                   type="email"
-                  placeholder="john@example.com"
+                  placeholder="guest@email.com"
                   value={newGuest.email}
                   onChange={(e) => setNewGuest({...newGuest, email: e.target.value})}
+                  className="border-orange-200 focus:border-orange-400"
                 />
               </div>
-              <Button onClick={handleAddGuest} className="w-full bg-green-600 hover:bg-green-700">
-                Add to Guest List 🎊
+              <Button onClick={handleAddGuest} className="w-full bg-orange-600 hover:bg-orange-700">
+                Add to Guest List
               </Button>
             </CardContent>
           </Card>
 
           {/* Quick Invite Options */}
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center text-blue-700">
                 <Share2 className="w-5 h-5 mr-2" />
@@ -135,28 +148,34 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
-                <MessageSquare className="w-5 h-5 mr-2" />
-                Import from Phone Contacts
+              <Button 
+                onClick={handleImportContacts}
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Import from Contacts
               </Button>
-              <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">
-                <Mail className="w-5 h-5 mr-2" />
-                Send Email Invitations
+              <Button 
+                onClick={handleCreateShareableLink}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                <Share2 className="w-5 h-5 mr-2" />
+                Create Shareable Link
               </Button>
               <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white">
                 <Instagram className="w-5 h-5 mr-2" />
                 Share on Social Media
               </Button>
               <Button className="w-full bg-purple-500 hover:bg-purple-600 text-white">
-                <Share2 className="w-5 h-5 mr-2" />
-                Create Shareable Link
+                <Mail className="w-5 h-5 mr-2" />
+                Send Email Invitations
               </Button>
             </CardContent>
           </Card>
         </div>
 
         {/* Guest List */}
-        <Card className="mt-6 shadow-lg">
+        <Card className="mt-6 shadow-lg bg-white/90 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center">
@@ -172,17 +191,17 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
           <CardContent>
             <div className="space-y-4">
               {guests.map((guest) => (
-                <div key={guest.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div key={guest.id} className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-100">
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-800">{guest.name}</h3>
                     <p className="text-sm text-gray-600">{guest.phone}</p>
                     {guest.email && <p className="text-sm text-gray-600">{guest.email}</p>}
-                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                      guest.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mt-2 ${
+                      guest.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' :
                       guest.status === 'declined' ? 'bg-red-100 text-red-800' :
-                      'bg-yellow-100 text-yellow-800'
+                      'bg-amber-100 text-amber-800'
                     }`}>
-                      {guest.status.toUpperCase()}
+                      {guest.status.charAt(0).toUpperCase() + guest.status.slice(1)}
                     </span>
                   </div>
                   <div className="flex space-x-2">

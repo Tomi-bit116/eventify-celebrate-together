@@ -12,30 +12,29 @@ export const Navbar = ({ onGetStarted }: NavbarProps) => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-orange-100">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-orange-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-3">
-            <div className="relative">
-              <span className="text-3xl animate-bounce-gentle">🎯</span>
-              <span className="absolute -top-1 -right-1 text-lg animate-wiggle">✨</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
+              <span className="text-lg text-white">☀️</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold bg-gradient-to-r from-coral-600 to-pink-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
                 Eventify
               </span>
-              <span className="text-xs text-gray-500 -mt-1">Your party planning bestie</span>
+              <span className="text-xs text-gray-500 -mt-1">Plan with confidence</span>
             </div>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-gray-600 hover:text-coral-600 transition-colors">
+            <a href="#features" className="text-gray-600 hover:text-orange-600 transition-colors font-medium">
               Features
             </a>
-            <a href="#testimonials" className="text-gray-600 hover:text-coral-600 transition-colors">
+            <a href="#testimonials" className="text-gray-600 hover:text-orange-600 transition-colors font-medium">
               Success Stories
             </a>
-            <a href="#pricing" className="text-gray-600 hover:text-coral-600 transition-colors">
+            <a href="#pricing" className="text-gray-600 hover:text-orange-600 transition-colors font-medium">
               Pricing
             </a>
           </div>
@@ -44,15 +43,15 @@ export const Navbar = ({ onGetStarted }: NavbarProps) => {
             <Button 
               onClick={handleSignIn}
               variant="ghost" 
-              className="text-gray-600 hover:text-coral-600 border-2 border-transparent hover:border-coral-200 transition-all duration-300"
+              className="text-gray-600 hover:text-orange-600 border border-transparent hover:border-orange-200 transition-all duration-300 font-medium"
             >
-              Sign In 👋
+              Sign In
             </Button>
             <Button 
               onClick={onGetStarted}
-              className="bg-gradient-to-r from-coral-500 to-pink-500 hover:from-coral-600 hover:to-pink-600 text-white rounded-full px-6 py-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+              className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-full px-6 py-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 font-medium"
             >
-              Get Started Free! 🚀
+              Get Started Free
             </Button>
           </div>
         </div>

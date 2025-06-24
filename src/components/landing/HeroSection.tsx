@@ -11,114 +11,111 @@ interface HeroSectionProps {
 export const HeroSection = ({ onGetStarted, onShowAuth }: HeroSectionProps) => {
   return (
     <section className="pt-20 pb-16 px-4 overflow-hidden relative">
-      {/* Floating party elements */}
+      {/* Subtle floating elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 text-4xl animate-bounce animation-delay-300">🎊</div>
-        <div className="absolute top-32 right-20 text-3xl animate-pulse animation-delay-700">✨</div>
-        <div className="absolute top-48 left-1/4 text-2xl animate-spin animation-delay-1000">🎉</div>
-        <div className="absolute bottom-40 right-10 text-3xl animate-bounce animation-delay-500">🥳</div>
-        <div className="absolute bottom-60 left-1/3 text-2xl animate-pulse animation-delay-900">💃</div>
+        <div className="absolute top-20 left-10 text-2xl opacity-30 animate-pulse animation-delay-300">✨</div>
+        <div className="absolute top-32 right-20 text-2xl opacity-20 animate-pulse animation-delay-700">🌟</div>
+        <div className="absolute bottom-40 right-10 text-2xl opacity-25 animate-pulse animation-delay-500">💫</div>
+        <div className="absolute bottom-60 left-1/3 text-2xl opacity-30 animate-pulse animation-delay-900">⭐</div>
       </div>
       
-      <div className="max-w-6xl mx-auto text-center relative z-10">
-        <div className="animate-bounce mb-8">
-          <span className="text-8xl">🎯</span>
-          <span className="text-4xl animate-wiggle">✨</span>
-          <span className="text-6xl animate-spin-slow">🎪</span>
+      <div className="max-w-5xl mx-auto text-center relative z-10">
+        {/* Elegant Logo */}
+        <div className="mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full shadow-lg mb-6">
+            <span className="text-3xl text-white">☀️</span>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-orange-600 via-amber-500 to-yellow-500 bg-clip-text text-transparent">
+            Eventify
+          </h1>
+          <p className="text-lg text-gray-600 font-medium">Your celebration planning companion</p>
         </div>
         
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-green-600 via-yellow-500 to-red-500 bg-clip-text text-transparent animate-fade-in">
-          Let's Party! 🎉
-        </h1>
-        
-        <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gray-800 animate-fade-in animation-delay-200">
-          Ready to throw the most amazing celebration? 🚀
+        <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800">
+          Create memorable celebrations with ease
         </h2>
         
-        <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-4xl mx-auto animate-fade-in animation-delay-400">
-          From intimate gatherings to grand celebrations - we'll help you plan it perfectly! 
-          No stress, no hassle. Just pure fun and amazing memories! 💫
+        <p className="text-xl text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed">
+          From intimate gatherings to grand celebrations, Eventify helps you plan every detail 
+          with confidence and joy. Organize, invite, budget, and celebrate—all in one place.
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
           <Button 
             onClick={onGetStarted}
-            className="bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 hover:from-green-600 hover:via-yellow-600 hover:to-red-600 text-white px-12 py-6 text-xl rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 animate-pulse border-4 border-white"
+            className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-10 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
           >
-            Get Started - It's Free! 🚀
+            Get Started Free
           </Button>
           
           <Button 
             onClick={onShowAuth}
             variant="outline" 
-            className="border-4 border-green-400 text-green-600 hover:bg-green-400 hover:text-white px-10 py-6 text-xl rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="border-2 border-orange-300 text-orange-700 hover:bg-orange-50 px-10 py-4 text-lg rounded-full transition-all duration-300 shadow-md hover:shadow-lg"
           >
-            Already have an account? Sign In! 👋
+            Sign In
           </Button>
         </div>
         
         {/* Feature highlights */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:rotate-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+          <Card className="bg-gradient-to-br from-orange-50 to-amber-50 border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
             <CardContent className="p-8 text-center">
-              <div className="text-6xl mb-6 animate-bounce">⚡</div>
-              <h3 className="font-bold text-2xl mb-4 text-green-800">Super Quick Setup!</h3>
-              <p className="text-gray-700 leading-relaxed">
-                Set up your celebration in just 2 minutes! Our system guides you step by step, making planning feel like a fun game! 🎮
-              </p>
-              <div className="mt-4 flex justify-center space-x-2">
-                <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                <Star className="w-5 h-5 text-yellow-500 fill-current" />
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-orange-400 to-amber-400 rounded-full flex items-center justify-center mb-6 shadow-lg">
+                <Sparkles className="w-8 h-8 text-white" />
               </div>
+              <h3 className="font-bold text-xl mb-4 text-gray-800">Simple Planning</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Intuitive tools that make event planning feel effortless. Set up your celebration in minutes, not hours.
+              </p>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-yellow-50 to-orange-100 border-yellow-200 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:-rotate-2">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
             <CardContent className="p-8 text-center">
-              <div className="text-6xl mb-6 animate-pulse">🎭</div>
-              <h3 className="font-bold text-2xl mb-4 text-orange-800">Made for Celebrations!</h3>
-              <p className="text-gray-700 leading-relaxed">
-                WhatsApp integration, budget tracking, guest management, plus features that speak your language - literally! 🗣️
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-400 to-indigo-400 rounded-full flex items-center justify-center mb-6 shadow-lg">
+                <Star className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="font-bold text-xl mb-4 text-gray-800">Smart Features</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Budget tracking, guest management, RSVP monitoring, and vendor coordination—all designed for your success.
               </p>
-              <div className="mt-4 text-2xl animate-bounce">🎊🎈🎉</div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-red-50 to-pink-100 border-red-200 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:rotate-2">
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
             <CardContent className="p-8 text-center">
-              <div className="text-6xl mb-6 animate-spin-slow">💝</div>
-              <h3 className="font-bold text-2xl mb-4 text-red-800">Start for Free!</h3>
-              <p className="text-gray-700 leading-relaxed">
-                Plan your first celebration completely free! No hidden charges, no credit card required. Just pure planning joy! 🎊
-              </p>
-              <div className="mt-4 flex justify-center">
-                <Heart className="w-6 h-6 text-red-500 fill-current animate-pulse" />
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-green-400 to-emerald-400 rounded-full flex items-center justify-center mb-6 shadow-lg">
+                <Heart className="w-8 h-8 text-white" />
               </div>
+              <h3 className="font-bold text-xl mb-4 text-gray-800">Always Free</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Start planning immediately with our free plan. Upgrade anytime to unlock premium features and support.
+              </p>
             </CardContent>
           </Card>
         </div>
 
         {/* Celebration showcase */}
-        <div className="bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 rounded-3xl p-8 text-white shadow-2xl">
-          <div className="text-5xl mb-4 animate-bounce">🎭</div>
-          <h3 className="text-3xl font-bold mb-4">Every Type of Celebration!</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-lg">
-            <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
-              <div className="text-3xl mb-2">💒</div>
-              <p>Wedding</p>
+        <div className="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 rounded-2xl p-8 text-white shadow-xl">
+          <div className="text-3xl mb-4">🎭</div>
+          <h3 className="text-2xl font-bold mb-6">Perfect for Every Celebration</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm hover:bg-white/30 transition-colors">
+              <div className="text-2xl mb-2">💒</div>
+              <p className="font-medium">Weddings</p>
             </div>
-            <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
-              <div className="text-3xl mb-2">🎂</div>
-              <p>Birthday</p>
+            <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm hover:bg-white/30 transition-colors">
+              <div className="text-2xl mb-2">🎂</div>
+              <p className="font-medium">Birthdays</p>
             </div>
-            <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
-              <div className="text-3xl mb-2">🎓</div>
-              <p>Graduation</p>
+            <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm hover:bg-white/30 transition-colors">
+              <div className="text-2xl mb-2">🎓</div>
+              <p className="font-medium">Graduations</p>
             </div>
-            <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
-              <div className="text-3xl mb-2">🎪</div>
-              <p>Party</p>
+            <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm hover:bg-white/30 transition-colors">
+              <div className="text-2xl mb-2">🎪</div>
+              <p className="font-medium">Parties</p>
             </div>
           </div>
         </div>
