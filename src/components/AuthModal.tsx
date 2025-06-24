@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -12,9 +11,10 @@ import { toast } from 'sonner';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onAuthSuccess: () => void;
 }
 
-export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
+export const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -41,6 +41,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Welcome to Eventify! Let's start planning your celebration.");
+      onAuthSuccess();
       onClose();
     }, 2000);
   };
@@ -50,6 +51,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Welcome back! Ready to plan something amazing?");
+      onAuthSuccess();
       onClose();
     }, 1500);
   };
