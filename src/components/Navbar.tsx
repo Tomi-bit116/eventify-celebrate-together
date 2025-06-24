@@ -6,6 +6,11 @@ interface NavbarProps {
 }
 
 export const Navbar = ({ onGetStarted }: NavbarProps) => {
+  const handleSignIn = () => {
+    console.log('Sign in clicked');
+    // Sign in logic will be implemented here
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-orange-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -37,16 +42,17 @@ export const Navbar = ({ onGetStarted }: NavbarProps) => {
           
           <div className="flex items-center space-x-4">
             <Button 
+              onClick={handleSignIn}
               variant="ghost" 
-              className="text-gray-600 hover:text-coral-600"
+              className="text-gray-600 hover:text-coral-600 border-2 border-transparent hover:border-coral-200 transition-all duration-300"
             >
-              Sign In
+              Sign In 👋
             </Button>
             <Button 
               onClick={onGetStarted}
               className="bg-gradient-to-r from-coral-500 to-pink-500 hover:from-coral-600 hover:to-pink-600 text-white rounded-full px-6 py-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
             >
-              Get Started 🚀
+              Get Started Free! 🚀
             </Button>
           </div>
         </div>

@@ -16,16 +16,19 @@ import {
   HelpCircle,
   Menu,
   X,
-  Globe,
-  MapPin,
   Clock,
   Camera,
   Sparkles,
-  Heart
+  Heart,
+  Star,
+  Crown
 } from 'lucide-react';
 import { CreateEventModal } from './dashboard/CreateEventModal';
 import { ProgressTracker } from './dashboard/ProgressTracker';
 import { LanguageToggle } from './dashboard/LanguageToggle';
+import { InviteGuestsPage } from './dashboard/InviteGuestsPage';
+import { BudgetPage } from './dashboard/BudgetPage';
+import { RSVPPage } from './dashboard/RSVPPage';
 
 export const Dashboard = () => {
   const [currentEvent, setCurrentEvent] = useState(null);
@@ -33,6 +36,7 @@ export const Dashboard = () => {
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'invite' | 'budget' | 'rsvp' | 'media' | 'tasks' | 'vendors' | 'analytics'>('dashboard');
 
   const handleEventCreated = (eventData: any) => {
     setCurrentEvent(eventData);
@@ -42,8 +46,46 @@ export const Dashboard = () => {
 
   const handleFeatureClick = (feature: string) => {
     console.log(`Opening ${feature} feature`);
-    // Feature-specific logic will be implemented
+    
+    switch (feature) {
+      case 'invite-guests':
+        setCurrentPage('invite');
+        break;
+      case 'manage-budget':
+        setCurrentPage('budget');
+        break;
+      case 'track-rsvps':
+        setCurrentPage('rsvp');
+        break;
+      case 'upload-media':
+        setCurrentPage('media');
+        break;
+      case 'task-checklist':
+        setCurrentPage('tasks');
+        break;
+      case 'vendor-booking':
+        setCurrentPage('vendors');
+        break;
+      case 'analytics':
+        setCurrentPage('analytics');
+        break;
+      default:
+        console.log(`Feature ${feature} not implemented yet`);
+    }
   };
+
+  // If we're on a different page, render that page
+  if (currentPage === 'invite') {
+    return <InviteGuestsPage onBack={() => setCurrentPage('dashboard')} />;
+  }
+  
+  if (currentPage === 'budget') {
+    return <BudgetPage onBack={() => setCurrentPage('dashboard')} />;
+  }
+  
+  if (currentPage === 'rsvp') {
+    return <RSVPPage onBack={() => setCurrentPage('dashboard')} />;
+  }
 
   const mainFeatures = [
     {
@@ -224,6 +266,15 @@ export const Dashboard = () => {
           <p className="text-xl text-gray-600 mb-8">
             Ready to make some magic happen? Let's turn your ideas into unforgettable celebrations! 🚀
           </p>
+          
+          {/* Freemium Badge */}
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-full px-6 py-3 mb-4">
+            <Crown className="w-5 h-5 text-yellow-600" />
+            <span className="font-medium text-yellow-800">Free Plan</span>
+            <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white ml-2">
+              Upgrade to Pro 🚀
+            </Button>
+          </div>
         </div>
 
         {/* Progress Tracker */}
@@ -308,19 +359,19 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Nigerian Celebration Showcase */}
+        {/* Celebration Showcase */}
         <div className="mb-8">
           <Card className="bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 border-0 shadow-2xl text-white">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center space-x-2 text-white">
-                <span className="text-3xl">🇳🇬</span>
-                <span className="text-2xl">Celebrate Nigerian Style! ✨</span>
-                <span className="text-3xl">🇳🇬</span>
+                <span className="text-3xl">🎭</span>
+                <span className="text-2xl">Celebrate Every Moment! ✨</span>
+                <span className="text-3xl">🎭</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center pb-8">
               <p className="text-white/90 mb-8 text-lg">
-                From owambe to traditional ceremonies - we got you covered for every Nigerian celebration! 
+                From intimate gatherings to grand celebrations - we've got you covered for every special moment! 
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm hover:bg-white/30 transition-colors cursor-pointer">
@@ -332,12 +383,12 @@ export const Dashboard = () => {
                   <p>Birthday</p>
                 </div>
                 <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm hover:bg-white/30 transition-colors cursor-pointer">
-                  <div className="text-3xl mb-2">👶</div>
-                  <p>Naming</p>
+                  <div className="text-3xl mb-2">🎓</div>
+                  <p>Graduation</p>
                 </div>
                 <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm hover:bg-white/30 transition-colors cursor-pointer">
-                  <div className="text-3xl mb-2">🥁</div>
-                  <p>Traditional</p>
+                  <div className="text-3xl mb-2">🎪</div>
+                  <p>Party</p>
                 </div>
               </div>
             </CardContent>
