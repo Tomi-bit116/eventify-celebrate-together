@@ -17,6 +17,10 @@ const Index = () => {
     setShowOnboarding(true);
   };
 
+  const handleSignIn = () => {
+    setShowAuth(true);
+  };
+
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
     setShowDashboard(true);
@@ -25,6 +29,11 @@ const Index = () => {
   const handleBackToLanding = () => {
     setShowOnboarding(false);
     setShowDashboard(false);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuth(false);
+    setShowDashboard(true);
   };
 
   if (showDashboard) {
@@ -41,19 +50,23 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-orange-50 to-yellow-50">
-      <Navbar onGetStarted={handleGetStarted} />
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+      <Navbar onGetStarted={handleGetStarted} onSignIn={handleSignIn} />
       
       <HeroSection 
         onGetStarted={handleGetStarted} 
-        onShowAuth={() => setShowAuth(true)} 
+        onSignIn={handleSignIn}
       />
       
       <FeaturesSection />
       
-      <CTASection onShowAuth={() => setShowAuth(true)} />
+      <CTASection onGetStarted={handleGetStarted} />
 
-      <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
+      <AuthModal 
+        isOpen={showAuth} 
+        onClose={() => setShowAuth(false)} 
+        onAuthSuccess={handleAuthSuccess}
+      />
     </div>
   );
 };

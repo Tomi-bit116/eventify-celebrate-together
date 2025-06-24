@@ -3,16 +3,12 @@ import { Button } from '@/components/ui/button';
 
 interface NavbarProps {
   onGetStarted: () => void;
+  onSignIn: () => void;
 }
 
-export const Navbar = ({ onGetStarted }: NavbarProps) => {
-  const handleSignIn = () => {
-    console.log('Sign in clicked');
-    // Sign in logic will be implemented here
-  };
-
+export const Navbar = ({ onGetStarted, onSignIn }: NavbarProps) => {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-orange-100 shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-amber-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-3">
@@ -31,17 +27,17 @@ export const Navbar = ({ onGetStarted }: NavbarProps) => {
             <a href="#features" className="text-gray-600 hover:text-orange-600 transition-colors font-medium">
               Features
             </a>
-            <a href="#testimonials" className="text-gray-600 hover:text-orange-600 transition-colors font-medium">
-              Success Stories
+            <a href="#about" className="text-gray-600 hover:text-orange-600 transition-colors font-medium">
+              About
             </a>
-            <a href="#pricing" className="text-gray-600 hover:text-orange-600 transition-colors font-medium">
-              Pricing
+            <a href="#contact" className="text-gray-600 hover:text-orange-600 transition-colors font-medium">
+              Contact
             </a>
           </div>
           
           <div className="flex items-center space-x-4">
             <Button 
-              onClick={handleSignIn}
+              onClick={onSignIn}
               variant="ghost" 
               className="text-gray-600 hover:text-orange-600 border border-transparent hover:border-orange-200 transition-all duration-300 font-medium"
             >
@@ -51,7 +47,7 @@ export const Navbar = ({ onGetStarted }: NavbarProps) => {
               onClick={onGetStarted}
               className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-full px-6 py-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 font-medium"
             >
-              Get Started Free
+              Get Started
             </Button>
           </div>
         </div>
