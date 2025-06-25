@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, FileTemplate, Users, DollarSign, CheckSquare } from 'lucide-react';
+import { ArrowLeft, FileText, Users, DollarSign, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface EventTemplatesPageProps {
@@ -133,7 +132,7 @@ export const EventTemplatesPage = ({ onBack }: EventTemplatesPageProps) => {
           </Button>
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-green-500 rounded-full flex items-center justify-center">
-              <FileTemplate className="w-6 h-6 text-white" />
+              <FileText className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-lime-600 bg-clip-text text-transparent">
               Event Templates
@@ -249,7 +248,7 @@ export const EventTemplatesPage = ({ onBack }: EventTemplatesPageProps) => {
             ) : (
               <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
                 <CardContent className="p-8 text-center">
-                  <FileTemplate className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                  <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
                   <h3 className="text-lg font-medium text-gray-600 mb-2">
                     Select a Template
                   </h3>

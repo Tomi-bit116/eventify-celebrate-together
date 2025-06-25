@@ -20,7 +20,7 @@ import {
   UserCheck,
   UserPlus,
   MessageCircle,
-  FileTemplate,
+  FileText,
   BookOpen
 } from 'lucide-react';
 import { CreateEventModal } from './dashboard/CreateEventModal';
@@ -168,7 +168,7 @@ export const Dashboard = () => {
       id: 'event-templates',
       title: "Event Templates",
       description: "Pre-built templates for quick setup",
-      icon: FileTemplate,
+      icon: FileText,
       color: "bg-gradient-to-br from-lime-500 to-emerald-600",
       onClick: () => handleFeatureClick('event-templates')
     },
