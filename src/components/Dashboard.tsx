@@ -56,6 +56,9 @@ export const Dashboard = () => {
     console.log(`Opening ${feature} feature`);
     
     switch (feature) {
+      case 'create-event':
+        setShowCreateModal(true);
+        break;
       case 'invite-guests':
         setCurrentPage('invite');
         break;

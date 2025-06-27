@@ -5,6 +5,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { 
   Menu, 
   X, 
+  Plus,
+  Users,
+  DollarSign,
+  UserCheck,
   UserPlus, 
   MessageCircle, 
   FileText, 
@@ -23,6 +27,34 @@ interface MainMenuProps {
 
 export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) => {
   const menuItems = [
+    {
+      id: 'create-event',
+      title: 'Create New Event',
+      description: 'Start planning your celebration',
+      icon: Plus,
+      color: 'from-lime-500 to-green-600'
+    },
+    {
+      id: 'invite-guests',
+      title: 'Invite Guests',
+      description: 'Build your guest list and send invitations',
+      icon: Users,
+      color: 'from-yellow-500 to-lime-600'
+    },
+    {
+      id: 'manage-budget',
+      title: 'Budget Tracker',
+      description: 'Monitor expenses and stay on track',
+      icon: DollarSign,
+      color: 'from-green-500 to-emerald-600'
+    },
+    {
+      id: 'track-rsvps',
+      title: 'Track RSVPs',
+      description: 'Monitor guest responses',
+      icon: UserCheck,
+      color: 'from-lime-500 to-yellow-600'
+    },
     {
       id: 'shared-access',
       title: 'Shared Access',
