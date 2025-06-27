@@ -22,10 +22,10 @@ export const HeroSection = ({ onGetStarted, onSignIn }: HeroSectionProps) => {
       <div className="max-w-6xl mx-auto text-center relative z-10">
         {/* Elegant Logo */}
         <div className="mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full shadow-xl mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 via-amber-400 to-lime-500 rounded-full shadow-xl mb-6">
             <span className="text-3xl text-white">☀️</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-orange-600 via-amber-500 to-yellow-500 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-orange-600 via-yellow-500 to-green-500 bg-clip-text text-transparent">
             Eventify
           </h1>
           <p className="text-lg text-gray-600 font-medium">Your celebration planning companion</p>
@@ -43,7 +43,7 @@ export const HeroSection = ({ onGetStarted, onSignIn }: HeroSectionProps) => {
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
           <Button 
             onClick={onGetStarted}
-            className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-12 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
+            className="bg-gradient-to-r from-yellow-500 via-orange-500 to-green-500 hover:from-yellow-600 hover:via-orange-600 hover:to-green-600 text-white px-12 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
           >
             Start Planning Today
           </Button>
@@ -51,7 +51,7 @@ export const HeroSection = ({ onGetStarted, onSignIn }: HeroSectionProps) => {
           <Button 
             onClick={onSignIn}
             variant="outline" 
-            className="border-2 border-orange-300 text-orange-700 hover:bg-orange-50 px-12 py-4 text-lg rounded-full transition-all duration-300 shadow-md hover:shadow-lg font-semibold"
+            className="border-2 border-green-300 text-green-700 hover:bg-green-50 px-12 py-4 text-lg rounded-full transition-all duration-300 shadow-md hover:shadow-lg font-semibold"
           >
             Sign In
           </Button>
@@ -59,9 +59,9 @@ export const HeroSection = ({ onGetStarted, onSignIn }: HeroSectionProps) => {
         
         {/* Feature highlights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
-          <Card className="bg-gradient-to-br from-orange-50 to-amber-50 border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
             <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-orange-400 to-amber-400 rounded-full flex items-center justify-center mb-6 shadow-lg">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center mb-6 shadow-lg">
                 <Calendar className="w-8 h-8 text-white" />
               </div>
               <h3 className="font-bold text-xl mb-4 text-gray-800">Effortless Planning</h3>
@@ -71,9 +71,9 @@ export const HeroSection = ({ onGetStarted, onSignIn }: HeroSectionProps) => {
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <Card className="bg-gradient-to-br from-green-50 to-lime-50 border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
             <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-400 to-indigo-400 rounded-full flex items-center justify-center mb-6 shadow-lg">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-green-400 to-lime-400 rounded-full flex items-center justify-center mb-6 shadow-lg">
                 <Users className="w-8 h-8 text-white" />
               </div>
               <h3 className="font-bold text-xl mb-4 text-gray-800">Guest Management</h3>
@@ -83,9 +83,9 @@ export const HeroSection = ({ onGetStarted, onSignIn }: HeroSectionProps) => {
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <Card className="bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
             <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-green-400 to-emerald-400 rounded-full flex items-center justify-center mb-6 shadow-lg">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-emerald-400 to-green-400 rounded-full flex items-center justify-center mb-6 shadow-lg">
                 <CheckCircle className="w-8 h-8 text-white" />
               </div>
               <h3 className="font-bold text-xl mb-4 text-gray-800">Smart Organization</h3>
@@ -97,7 +97,7 @@ export const HeroSection = ({ onGetStarted, onSignIn }: HeroSectionProps) => {
         </div>
 
         {/* Celebration showcase */}
-        <div className="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 rounded-2xl p-8 text-white shadow-xl">
+        <div className="bg-gradient-to-r from-yellow-500 via-orange-500 to-green-500 rounded-2xl p-8 text-white shadow-xl">
           <div className="text-4xl mb-6">🎭</div>
           <h3 className="text-2xl md:text-3xl font-bold mb-8">Perfect for Every Celebration</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

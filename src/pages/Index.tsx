@@ -50,7 +50,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50">
       <Navbar onGetStarted={handleGetStarted} onSignIn={handleSignIn} />
       
       <HeroSection 

@@ -7,7 +7,7 @@ interface CTASectionProps {
 
 export const CTASection = ({ onGetStarted }: CTASectionProps) => {
   return (
-    <section className="py-20 px-4 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500">
+    <section className="py-20 px-4 bg-gradient-to-r from-yellow-500 via-orange-500 to-green-500">
       <div className="max-w-4xl mx-auto text-center text-white">
         <div className="animate-bounce mb-8">
           <span className="text-5xl">🎊</span>
@@ -24,7 +24,7 @@ export const CTASection = ({ onGetStarted }: CTASectionProps) => {
         
         <Button 
           onClick={onGetStarted}
-          className="bg-white text-orange-600 hover:bg-gray-100 px-10 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
+          className="bg-white text-green-600 hover:bg-gray-100 px-10 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
         >
           Start Your Celebration Journey
         </Button>
