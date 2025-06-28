@@ -1,24 +1,36 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { OnboardingFlow } from '@/components/OnboardingFlow';
 import { Dashboard } from '@/components/Dashboard';
 import { Navbar } from '@/components/Navbar';
-import { AuthModal } from '@/components/AuthModal';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
 import { CTASection } from '@/components/landing/CTASection';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
-  const [showAuth, setShowAuth] = useState(false);
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
 
+  useEffect(() => {
+    if (!loading && user) {
+      setShowDashboard(true);
+    }
+  }, [user, loading]);
+
   const handleGetStarted = () => {
-    setShowOnboarding(true);
+    if (user) {
+      setShowOnboarding(true);
+    } else {
+      navigate('/auth');
+    }
   };
 
   const handleSignIn = () => {
-    setShowAuth(true);
+    navigate('/auth');
   };
 
   const handleOnboardingComplete = () => {
@@ -31,16 +43,24 @@ const Index = () => {
     setShowDashboard(false);
   };
 
-  const handleAuthSuccess = () => {
-    setShowAuth(false);
-    setShowDashboard(true);
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mb-4 shadow-lg animate-pulse">
+            <span className="text-2xl text-white">☀️</span>
+          </div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (showDashboard) {
+  if (user && showDashboard) {
     return <Dashboard />;
   }
 
-  if (showOnboarding) {
+  if (user && showOnboarding) {
     return (
       <OnboardingFlow
         onComplete={handleOnboardingComplete}
@@ -61,12 +81,6 @@ const Index = () => {
       <FeaturesSection />
       
       <CTASection onGetStarted={handleGetStarted} />
-
-      <AuthModal 
-        isOpen={showAuth} 
-        onClose={() => setShowAuth(false)} 
-        onAuthSuccess={handleAuthSuccess}
-      />
     </div>
   );
 };
