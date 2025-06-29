@@ -6,6 +6,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Clock, CheckSquare, ListChecks } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { CreateEventModal } from '@/components/dashboard/CreateEventModal';
+import { InviteGuestsModal } from '@/components/dashboard/InviteGuestsModal';
+import { BudgetTracker } from '@/components/dashboard/BudgetTracker';
+import { InviteGuestsPage } from '@/components/dashboard/InviteGuestsPage';
+import { EventTemplatesPage } from '@/components/dashboard/EventTemplatesPage';
+import { TrackRSVPsPage } from '@/components/dashboard/TrackRSVPsPage';
+import { TaskChecklistPage } from '@/components/dashboard/TaskChecklistPage';
 
 interface DashboardProps {
   // Add any props you want to pass to the dashboard
@@ -16,6 +23,12 @@ export const Dashboard = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
+  const [currentEvent, setCurrentEvent] = useState<any>(null);
+
+  // Modal states
+  const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
+  const [isInviteGuestsModalOpen, setIsInviteGuestsModalOpen] = useState(false);
+  const [isBudgetTrackerOpen, setIsBudgetTrackerOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -29,20 +42,80 @@ export const Dashboard = () => {
   const handleFeatureClick = (featureId: string) => {
     setActiveFeature(featureId);
     console.log(`Feature ${featureId} clicked`);
+    
+    // Handle specific features
+    switch (featureId) {
+      case 'create-event':
+        setIsCreateEventModalOpen(true);
+        break;
+      case 'invite-guests':
+        if (currentEvent) {
+          setActiveFeature('invite-guests');
+        } else {
+          toast.error("Please create an event first");
+        }
+        break;
+      case 'manage-budget':
+        if (currentEvent) {
+          setIsBudgetTrackerOpen(true);
+        } else {
+          toast.error("Please create an event first");
+        }
+        break;
+      case 'track-rsvps':
+        setActiveFeature('track-rsvps');
+        break;
+      case 'task-checklist':
+        setActiveFeature('task-checklist');
+        break;
+      case 'event-templates':
+        setActiveFeature('event-templates');
+        break;
+      default:
+        // For other features, just update the active feature
+        break;
+    }
+  };
+
+  const handleEventCreated = (eventData: any) => {
+    setCurrentEvent(eventData);
+    toast.success(`Event "${eventData.name}" created successfully!`);
+    setIsCreateEventModalOpen(false);
+  };
+
+  const handleBackToDashboard = () => {
+    setActiveFeature(null);
   };
 
   const progressData = [
-    { label: 'Planning', value: 75, color: 'bg-yellow-500' },
-    { label: 'Budget', value: 50, color: 'bg-green-500' },
-    { label: 'Guests', value: 90, color: 'bg-lime-500' },
+    { label: 'Planning', value: currentEvent ? 75 : 0, color: 'bg-yellow-500' },
+    { label: 'Budget', value: currentEvent ? 50 : 0, color: 'bg-green-500' },
+    { label: 'Guests', value: currentEvent ? 90 : 0, color: 'bg-lime-500' },
   ];
 
   const quickStats = [
-    { label: 'Days Left', value: 28, icon: Calendar },
-    { label: 'Tasks Due', value: 5, icon: ListChecks },
-    { label: 'In Budget', value: 'Yes', icon: CheckSquare },
-    { label: 'Time to Party', value: '7:00 PM', icon: Clock },
+    { label: 'Days Left', value: currentEvent ? 28 : 0, icon: Calendar },
+    { label: 'Tasks Due', value: currentEvent ? 5 : 0, icon: ListChecks },
+    { label: 'In Budget', value: currentEvent ? 'Yes' : 'N/A', icon: CheckSquare },
+    { label: 'Time to Party', value: currentEvent?.time || 'Not Set', icon: Clock },
   ];
+
+  // Render different pages based on active feature
+  if (activeFeature === 'invite-guests') {
+    return <InviteGuestsPage onBack={handleBackToDashboard} />;
+  }
+
+  if (activeFeature === 'event-templates') {
+    return <EventTemplatesPage onBack={handleBackToDashboard} />;
+  }
+
+  if (activeFeature === 'track-rsvps') {
+    return <TrackRSVPsPage onBack={handleBackToDashboard} />;
+  }
+
+  if (activeFeature === 'task-checklist') {
+    return <TaskChecklistPage onBack={handleBackToDashboard} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50">
@@ -85,17 +158,44 @@ export const Dashboard = () => {
                   Welcome back{user?.user_metadata?.display_name ? `, ${user.user_metadata.display_name}` : ''}! 🎉
                 </h1>
                 <p className="text-gray-600">
-                  Ready to plan your next amazing celebration?
+                  {currentEvent ? `Currently planning: ${currentEvent.name}` : 'Ready to plan your next amazing celebration?'}
                 </p>
               </div>
               <Button
                 onClick={handleSignOut}
                 variant="outline"
-                className="hidden md:flex items-center gap-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50"
+                className="md:hidden flex items-center gap-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50"
               >
                 Sign Out
               </Button>
             </div>
+            
+            {/* Current Event Info */}
+            {currentEvent && (
+              <Card className="mb-6 border-0 shadow-md bg-gradient-to-r from-blue-50 to-indigo-50">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Current Event</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Name:</span>
+                      <p className="font-medium">{currentEvent.name}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Date:</span>
+                      <p className="font-medium">{currentEvent.date}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Venue:</span>
+                      <p className="font-medium">{currentEvent.venue}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Expected Guests:</span>
+                      <p className="font-medium">{currentEvent.expectedGuests}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             
             {/* Progress Tracker */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -133,16 +233,50 @@ export const Dashboard = () => {
           {/* Main Content Area */}
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              {activeFeature ? `Feature: ${activeFeature}` : 'Dashboard Overview'}
+              {activeFeature ? `Feature: ${activeFeature}` : currentEvent ? `${currentEvent.name} Dashboard` : 'Dashboard Overview'}
             </h2>
-            <p className="text-gray-600">
-              {activeFeature ? `You are currently viewing the ${activeFeature} feature.` : 'Select a feature from the menu to start planning your event.'}
+            <p className="text-gray-600 mb-6">
+              {activeFeature 
+                ? `You are currently viewing the ${activeFeature} feature.` 
+                : currentEvent 
+                  ? 'Manage your event using the menu on the left. Track progress, invite guests, and stay organized!'
+                  : 'Create your first event to get started with planning your celebration!'
+              }
             </p>
+            
+            {!currentEvent && !activeFeature && (
+              <div className="text-center py-8">
+                <Button 
+                  onClick={() => setIsCreateEventModalOpen(true)}
+                  className="bg-gradient-to-r from-yellow-500 to-green-500 hover:from-yellow-600 hover:to-green-600 text-white px-8 py-3 text-lg"
+                >
+                  Create Your First Event
+                </Button>
+              </div>
+            )}
           </div>
         </main>
       </div>
 
-      {/* Auth Modal */}
+      {/* Modals */}
+      <CreateEventModal 
+        isOpen={isCreateEventModalOpen}
+        onClose={() => setIsCreateEventModalOpen(false)}
+        onEventCreated={handleEventCreated}
+      />
+      
+      <InviteGuestsModal 
+        isOpen={isInviteGuestsModalOpen}
+        onClose={() => setIsInviteGuestsModalOpen(false)}
+        eventData={currentEvent}
+      />
+      
+      <BudgetTracker 
+        isOpen={isBudgetTrackerOpen}
+        onClose={() => setIsBudgetTrackerOpen(false)}
+        eventData={currentEvent}
+      />
+
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onAuthSuccess={() => {}} />
     </div>
   );

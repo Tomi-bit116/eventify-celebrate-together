@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -118,7 +117,9 @@ export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) =>
 
   const handleItemClick = (itemId: string) => {
     onFeatureClick(itemId);
-    onToggle(); // Close menu on mobile after selection
+    if (window.innerWidth < 1024) {
+      onToggle();
+    }
   };
 
   return (
