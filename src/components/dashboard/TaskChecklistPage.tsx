@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,7 +29,14 @@ export const TaskChecklistPage = ({ onBack }: TaskChecklistPageProps) => {
     { id: '5', title: 'Plan menu', description: 'Finalize food and drink menu', completed: false, dueDate: '2024-07-12', priority: 'high', category: 'Catering' },
   ]);
 
-  const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '', priority: 'medium' as const, category: '' });
+  const [newTask, setNewTask] = useState<{
+    title: string;
+    description: string;
+    dueDate: string;
+    priority: 'high' | 'medium' | 'low';
+    category: string;
+  }>({ title: '', description: '', dueDate: '', priority: 'medium', category: '' });
+  
   const [filterCategory, setFilterCategory] = useState('all');
 
   const categories = ['all', ...Array.from(new Set(tasks.map(task => task.category)))];
