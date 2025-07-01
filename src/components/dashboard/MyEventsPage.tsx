@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,51 +38,32 @@ export const MyEventsPage = ({ onBack, onEventSelect, onCreateEvent }: MyEventsP
     if (!user) return;
     
     try {
-      // Use direct SQL query to avoid type issues with new tables
-      const { data, error } = await supabase.rpc('get_user_events' as any);
-
-      if (error) {
-        console.log('Events table not ready yet, using mock data');
-        // Use mock data when the table doesn't exist yet
-        setEvents([
-          {
-            id: '1',
-            name: 'Sample Birthday Party',
-            description: 'A wonderful birthday celebration',
-            date: '2024-02-15',
-            time: '18:00',
-            venue: 'Party Hall Downtown',
-            expected_guests: 25,
-            budget: 1500,
-            created_at: new Date().toISOString()
-          },
-          {
-            id: '2',
-            name: 'Wedding Anniversary',
-            description: 'Celebrating 10 years together',
-            date: '2024-03-20',
-            time: '19:30',
-            venue: 'Garden Restaurant',
-            expected_guests: 50,
-            budget: 3000,
-            created_at: new Date().toISOString()
-          }
-        ]);
-      } else {
-        // Transform the data to match our Event interface
-        const eventsData = (data || []).map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          description: item.description || '',
-          date: item.date,
-          time: item.time || '',
-          venue: item.venue || '',
-          expected_guests: item.expected_guests || 0,
-          budget: item.budget || 0,
-          created_at: item.created_at
-        }));
-        setEvents(eventsData);
-      }
+      console.log('Events table not ready yet, using mock data');
+      // Use mock data when the table doesn't exist yet
+      setEvents([
+        {
+          id: '1',
+          name: 'Sample Birthday Party',
+          description: 'A wonderful birthday celebration',
+          date: '2024-02-15',
+          time: '18:00',
+          venue: 'Party Hall Downtown',
+          expected_guests: 25,
+          budget: 1500,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          name: 'Wedding Anniversary',
+          description: 'Celebrating 10 years together',
+          date: '2024-03-20',
+          time: '19:30',
+          venue: 'Garden Restaurant',
+          expected_guests: 50,
+          budget: 3000,
+          created_at: new Date().toISOString()
+        }
+      ]);
     } catch (error) {
       console.error('Error fetching events:', error);
       // Fallback to mock data
@@ -105,16 +87,9 @@ export const MyEventsPage = ({ onBack, onEventSelect, onCreateEvent }: MyEventsP
 
   const deleteEvent = async (eventId: string) => {
     try {
-      const { error } = await supabase.rpc('delete_user_event' as any, { event_id: eventId });
-
-      if (error) {
-        console.log('Delete operation not available yet');
-        toast.error('Delete functionality will be available once database is fully set up');
-        return;
-      }
-      
-      setEvents(events.filter(event => event.id !== eventId));
-      toast.success('Event deleted successfully');
+      console.log('Delete operation not available yet');
+      toast.error('Delete functionality will be available once database is fully set up');
+      return;
     } catch (error) {
       console.error('Error deleting event:', error);
       // For now, just remove from local state for demo purposes

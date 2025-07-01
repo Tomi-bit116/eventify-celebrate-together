@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,79 +36,61 @@ export const TimelinePage = ({ onBack }: TimelinePageProps) => {
     if (!user) return;
     
     try {
-      // Use direct RPC call to avoid type issues with new tables
-      const { data: tasks, error: tasksError } = await supabase.rpc('get_user_timeline' as any);
-
-      if (tasksError) {
-        console.log('Tasks table not ready yet, using mock data');
-        // Use mock timeline data when the table doesn't exist yet
-        const mockItems: TimelineItem[] = [
-          {
-            id: '1',
-            title: 'Send out invitations',
-            description: 'Create and send digital invitations to all guests',
-            date: '2024-02-01',
-            type: 'task',
-            completed: true,
-            priority: 'high',
-            event_name: 'Sample Birthday Party'
-          },
-          {
-            id: '2',
-            title: 'Book venue',
-            description: 'Confirm booking for Party Hall Downtown',
-            date: '2024-02-05',
-            type: 'milestone',
-            completed: true,
-            priority: 'high',
-            event_name: 'Sample Birthday Party'
-          },
-          {
-            id: '3',
-            title: 'Order cake',
-            description: 'Order custom birthday cake from local bakery',
-            date: '2024-02-10',
-            type: 'task',
-            completed: false,
-            priority: 'medium',
-            event_name: 'Sample Birthday Party'
-          },
-          {
-            id: '4',
-            title: 'Buy decorations',
-            description: 'Purchase balloons, streamers, and table decorations',
-            date: '2024-02-12',
-            type: 'task',
-            completed: false,
-            priority: 'medium',
-            event_name: 'Sample Birthday Party'
-          },
-          {
-            id: '5',
-            title: 'Final headcount',
-            description: 'Confirm final number of guests with caterer',
-            date: '2024-02-14',
-            type: 'deadline',
-            completed: false,
-            priority: 'high',
-            event_name: 'Sample Birthday Party'
-          }
-        ];
-        setTimelineItems(mockItems);
-      } else {
-        // Transform tasks into timeline items
-        const items: TimelineItem[] = (tasks || []).map((task: any) => ({
-          id: task.id,
-          title: task.title,
-          description: task.description || '',
-          date: task.due_date,
-          type: 'task' as const,
-          completed: task.completed || false,
-          priority: (task.priority || 'medium') as 'low' | 'medium' | 'high',
-          event_name: task.event_name || 'Unknown Event'
-        }));
-        setTimelineItems(items);
-      }
+      console.log('Tasks table not ready yet, using mock data');
+      // Use mock timeline data when the table doesn't exist yet
+      const mockItems: TimelineItem[] = [
+        {
+          id: '1',
+          title: 'Send out invitations',
+          description: 'Create and send digital invitations to all guests',
+          date: '2024-02-01',
+          type: 'task',
+          completed: true,
+          priority: 'high',
+          event_name: 'Sample Birthday Party'
+        },
+        {
+          id: '2',
+          title: 'Book venue',
+          description: 'Confirm booking for Party Hall Downtown',
+          date: '2024-02-05',
+          type: 'milestone',
+          completed: true,
+          priority: 'high',
+          event_name: 'Sample Birthday Party'
+        },
+        {
+          id: '3',
+          title: 'Order cake',
+          description: 'Order custom birthday cake from local bakery',
+          date: '2024-02-10',
+          type: 'task',
+          completed: false,
+          priority: 'medium',
+          event_name: 'Sample Birthday Party'
+        },
+        {
+          id: '4',
+          title: 'Buy decorations',
+          description: 'Purchase balloons, streamers, and table decorations',
+          date: '2024-02-12',
+          type: 'task',
+          completed: false,
+          priority: 'medium',
+          event_name: 'Sample Birthday Party'
+        },
+        {
+          id: '5',
+          title: 'Final headcount',
+          description: 'Confirm final number of guests with caterer',
+          date: '2024-02-14',
+          type: 'deadline',
+          completed: false,
+          priority: 'high',
+          event_name: 'Sample Birthday Party'
+        }
+      ];
+      setTimelineItems(mockItems);
     } catch (error) {
       console.error('Error fetching timeline data:', error);
       // Fallback to mock data
