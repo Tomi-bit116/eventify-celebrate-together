@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { MainMenu } from '@/components/MainMenu';
 import { AuthModal } from '@/components/AuthModal';
@@ -13,10 +14,9 @@ import { InviteGuestsPage } from '@/components/dashboard/InviteGuestsPage';
 import { EventTemplatesPage } from '@/components/dashboard/EventTemplatesPage';
 import { TrackRSVPsPage } from '@/components/dashboard/TrackRSVPsPage';
 import { TaskChecklistPage } from '@/components/dashboard/TaskChecklistPage';
-
-interface DashboardProps {
-  // Add any props you want to pass to the dashboard
-}
+import { MyEventsPage } from '@/components/dashboard/MyEventsPage';
+import { TimelinePage } from '@/components/dashboard/TimelinePage';
+import { SettingsPage } from '@/components/dashboard/SettingsPage';
 
 export const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -71,6 +71,15 @@ export const Dashboard = () => {
       case 'event-templates':
         setActiveFeature('event-templates');
         break;
+      case 'my-events':
+        setActiveFeature('my-events');
+        break;
+      case 'timeline':
+        setActiveFeature('timeline');
+        break;
+      case 'settings':
+        setActiveFeature('settings');
+        break;
       default:
         // For other features, just update the active feature
         break;
@@ -85,6 +94,12 @@ export const Dashboard = () => {
 
   const handleBackToDashboard = () => {
     setActiveFeature(null);
+  };
+
+  const handleEventSelect = (event: any) => {
+    setCurrentEvent(event);
+    setActiveFeature(null);
+    toast.success(`Now managing: ${event.name}`);
   };
 
   const progressData = [
@@ -117,10 +132,28 @@ export const Dashboard = () => {
     return <TaskChecklistPage onBack={handleBackToDashboard} />;
   }
 
+  if (activeFeature === 'my-events') {
+    return (
+      <MyEventsPage 
+        onBack={handleBackToDashboard} 
+        onEventSelect={handleEventSelect}
+        onCreateEvent={() => setIsCreateEventModalOpen(true)}
+      />
+    );
+  }
+
+  if (activeFeature === 'timeline') {
+    return <TimelinePage onBack={handleBackToDashboard} />;
+  }
+
+  if (activeFeature === 'settings') {
+    return <SettingsPage onBack={handleBackToDashboard} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50">
       {/* Header Section */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-amber-100 shadow-sm h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+      <header className="fixed top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-b border-amber-100 shadow-sm h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
             <span className="text-lg text-white">☀️</span>
@@ -142,7 +175,7 @@ export const Dashboard = () => {
         </Button>
       </header>
       
-      <div className="flex h-[calc(100vh-80px)]">
+      <div className="flex h-[calc(100vh-80px)] pt-20">
         <MainMenu 
           onFeatureClick={handleFeatureClick} 
           isOpen={isMobileMenuOpen}
@@ -190,7 +223,7 @@ export const Dashboard = () => {
                     </div>
                     <div>
                       <span className="text-gray-600">Expected Guests:</span>
-                      <p className="font-medium">{currentEvent.expectedGuests}</p>
+                      <p className="font-medium">{currentEvent.expected_guests}</p>
                     </div>
                   </div>
                 </CardContent>

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -124,10 +125,10 @@ export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) =>
 
   return (
     <>
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Button - Moved to right side */}
       <Button
         onClick={onToggle}
-        className="lg:hidden fixed top-4 left-4 z-50 bg-gradient-to-r from-yellow-500 to-lime-500 text-white p-2 rounded-full shadow-lg"
+        className="lg:hidden fixed top-4 right-4 z-50 bg-gradient-to-r from-yellow-500 to-lime-500 text-white p-2 rounded-full shadow-lg"
       >
         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </Button>
@@ -175,7 +176,7 @@ export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) =>
           ))}
         </div>
 
-        {/* Quick Access Section */}
+        {/* Quick Access Section - Now clickable */}
         <div className="p-4 border-t border-gray-200">
           <h3 className="font-semibold text-gray-700 mb-3">Quick Access</h3>
           {quickAccessItems.map((item) => (
