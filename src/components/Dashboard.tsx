@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { MainMenu } from '@/components/MainMenu';
 import { AuthModal } from '@/components/AuthModal';
@@ -167,7 +166,16 @@ export const Dashboard = () => {
   }
 
   if (activeFeature === 'vendor-contact-book') {
-    return <VendorContactBookPage onBack={handleBackToDashboard} />;
+    return (
+      <VendorContactBookPage 
+        onBack={handleBackToDashboard}
+        onWhatsAppMessage={(vendor) => {
+          // Switch to WhatsApp integration with pre-filled vendor data
+          setActiveFeature('whatsapp-integration');
+          // Could pass vendor data here if needed
+        }}
+      />
+    );
   }
 
   if (activeFeature === 'whatsapp-integration') {
@@ -176,7 +184,7 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50">
-      {/* Header Section */}
+      {/* Header Section - Simplified without duplicate sign out */}
       <header className="fixed top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-b border-amber-100 shadow-sm h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
@@ -189,14 +197,6 @@ export const Dashboard = () => {
             <span className="text-xs text-gray-500 -mt-1">Plan with confidence</span>
           </div>
         </div>
-
-        <Button
-          onClick={handleSignOut}
-          variant="outline"
-          className="hidden md:flex items-center gap-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50"
-        >
-          Sign Out
-        </Button>
       </header>
       
       <div className="flex h-[calc(100vh-80px)] pt-20">
@@ -218,13 +218,6 @@ export const Dashboard = () => {
                   {currentEvent ? `Currently planning: ${currentEvent.name}` : 'Ready to plan your next amazing celebration?'}
                 </p>
               </div>
-              <Button
-                onClick={handleSignOut}
-                variant="outline"
-                className="md:hidden flex items-center gap-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50 w-full sm:w-auto"
-              >
-                Sign Out
-              </Button>
             </div>
             
             {/* Current Event Info */}

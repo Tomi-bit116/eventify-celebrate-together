@@ -16,8 +16,11 @@ import {
   BookOpen,
   Calendar,
   Clock,
-  Settings
+  Settings,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface MainMenuProps {
   onFeatureClick: (feature: string) => void;
@@ -26,6 +29,17 @@ interface MainMenuProps {
 }
 
 export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) => {
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Signed out successfully");
+    } catch (error) {
+      toast.error("Error signing out");
+    }
+  };
+
   const menuItems = [
     {
       id: 'create-event',
@@ -176,7 +190,7 @@ export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) =>
           ))}
         </div>
 
-        {/* Quick Access Section - Now clickable */}
+        {/* Quick Access Section */}
         <div className="p-4 border-t border-gray-200">
           <h3 className="font-semibold text-gray-700 mb-3">Quick Access</h3>
           {quickAccessItems.map((item) => (
@@ -198,6 +212,26 @@ export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) =>
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Sign Out Section */}
+        <div className="p-4 border-t border-gray-200 mt-auto">
+          <Card
+            className="cursor-pointer hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-r from-red-50 to-red-100 hover:from-red-100 hover:to-red-200"
+            onClick={handleSignOut}
+          >
+            <CardContent className="p-3">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center">
+                  <LogOut className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-800 text-sm">Sign Out</h4>
+                  <p className="text-xs text-gray-600">Log out of your account</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </>

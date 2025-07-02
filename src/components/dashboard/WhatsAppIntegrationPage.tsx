@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, MessageCircle, Send, Phone, User, Clock } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Send, Phone, User, Clock, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -34,8 +33,11 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
   const { user } = useAuth();
   const [messages, setMessages] = useState<WhatsAppMessage[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [vendors, setVendors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSendModal, setShowSendModal] = useState(false);
+  const [showVendorModal, setShowVendorModal] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState<any>(null);
   const [messageData, setMessageData] = useState({
     recipient_phone: '',
     recipient_name: '',
@@ -55,6 +57,14 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
     {
       name: 'RSVP Request',
       content: 'Hi {name}! Please confirm your attendance for {event_name}. Reply with YES or NO.'
+    },
+    {
+      name: 'Vendor Inquiry',
+      content: 'Hi {name}! I hope you\'re doing well. I\'m planning an event and would like to discuss your {service} services. Are you available for a quick chat?'
+    },
+    {
+      name: 'Vendor Follow-up',
+      content: 'Hi {name}! Thank you for discussing your services with me. Could you please send me a detailed quote for {service}?'
     },
     {
       name: 'Thank You',
@@ -80,6 +90,15 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
 
       if (eventsError) throw eventsError;
       setEvents(eventsData || []);
+
+      // Fetch vendors
+      const { data: vendorsData, error: vendorsError } = await supabase
+        .from('vendors')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (vendorsError) throw vendorsError;
+      setVendors(vendorsData || []);
 
       // Fetch WhatsApp messages
       const { data: messagesData, error: messagesError } = await supabase
@@ -118,8 +137,16 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
       if (error) throw error;
 
       setMessages([data, ...messages]);
-      toast.success('Message sent successfully! (Note: This is a demo - no actual WhatsApp message was sent)');
+      
+      // Open WhatsApp with the message
+      const phoneNumber = messageData.recipient_phone.replace(/\D/g, '');
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageData.message_content)}`;
+      window.open(whatsappUrl, '_blank');
+      
+      toast.success('Message logged and WhatsApp opened!');
       setShowSendModal(false);
+      setShowVendorModal(false);
+      setSelectedVendor(null);
       setMessageData({
         recipient_phone: '',
         recipient_name: '',
@@ -132,8 +159,24 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
     }
   };
 
+  const handleVendorMessage = (vendor: any) => {
+    setSelectedVendor(vendor);
+    setMessageData({
+      recipient_phone: vendor.contact_phone,
+      recipient_name: vendor.name,
+      message_content: `Hi ${vendor.name}! I hope you're doing well. I'm planning an event and would like to discuss your ${vendor.service_type} services. Are you available for a quick chat?`,
+      event_id: ''
+    });
+    setShowVendorModal(true);
+  };
+
   const useTemplate = (template: string) => {
-    setMessageData({...messageData, message_content: template});
+    let content = template;
+    if (selectedVendor) {
+      content = content.replace('{name}', selectedVendor.name);
+      content = content.replace('{service}', selectedVendor.service_type);
+    }
+    setMessageData({...messageData, message_content: content});
   };
 
   const getEventName = (eventId: string) => {
@@ -187,14 +230,48 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
             </div>
           </div>
           
-          <Button 
-            onClick={() => setShowSendModal(true)}
-            className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white w-full sm:w-auto"
-          >
-            <Send className="w-4 h-4 mr-2" />
-            Send Message
-          </Button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button 
+              onClick={() => setShowSendModal(true)}
+              className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white flex-1 sm:flex-none"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              Send Message
+            </Button>
+            <Button 
+              onClick={() => setShowVendorModal(true)}
+              variant="outline"
+              className="border-green-500 text-green-600 hover:bg-green-50 flex-1 sm:flex-none"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Message Vendor
+            </Button>
+          </div>
         </div>
+
+        {/* Quick Vendor Access */}
+        {vendors.length > 0 && (
+          <Card className="shadow-lg bg-white/90 backdrop-blur-sm mb-6">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Message Vendors</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {vendors.slice(0, 8).map((vendor) => (
+                  <Button
+                    key={vendor.id}
+                    variant="outline"
+                    onClick={() => handleVendorMessage(vendor)}
+                    className="justify-start h-auto p-3 hover:bg-green-50 border-green-200"
+                  >
+                    <div className="text-left">
+                      <div className="font-medium text-sm truncate">{vendor.name}</div>
+                      <div className="text-xs text-gray-500">{vendor.service_type}</div>
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Messages History */}
         {messages.length === 0 ? (
@@ -202,14 +279,26 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
             <CardContent className="p-12 text-center">
               <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-700 mb-2">No messages sent yet</h3>
-              <p className="text-gray-600 mb-6">Start sending WhatsApp messages to your event guests!</p>
-              <Button 
-                onClick={() => setShowSendModal(true)}
-                className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
-              >
-                <Send className="w-4 h-4 mr-2" />
-                Send First Message
-              </Button>
+              <p className="text-gray-600 mb-6">Start sending WhatsApp messages to your event guests and vendors!</p>
+              <div className="flex gap-3 justify-center">
+                <Button 
+                  onClick={() => setShowSendModal(true)}
+                  className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Send First Message
+                </Button>
+                {vendors.length > 0 && (
+                  <Button 
+                    onClick={() => setShowVendorModal(true)}
+                    variant="outline"
+                    className="border-green-500 text-green-600 hover:bg-green-50"
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Message Vendor
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         ) : (
@@ -248,12 +337,69 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
           </div>
         )}
 
+        {/* Vendor Selection Modal */}
+        <Dialog open={showVendorModal} onOpenChange={setShowVendorModal}>
+          <DialogContent className="max-w-2xl mx-auto bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-gray-800 mb-4">
+                Select Vendor to Message
+              </DialogTitle>
+            </DialogHeader>
+            
+            {vendors.length === 0 ? (
+              <div className="text-center py-8">
+                <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">No vendors found. Add vendors first to message them.</p>
+                <Button 
+                  onClick={() => setShowVendorModal(false)}
+                  variant="outline"
+                >
+                  Close
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-3 max-h-96 overflow-y-auto">
+                {vendors.map((vendor) => (
+                  <Card
+                    key={vendor.id}
+                    className="cursor-pointer hover:shadow-md transition-all duration-200 border hover:border-green-300"
+                    onClick={() => handleVendorMessage(vendor)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-gray-800">{vendor.name}</h4>
+                          <p className="text-sm text-gray-600">{vendor.service_type}</p>
+                          <p className="text-xs text-gray-500">{vendor.contact_phone}</p>
+                        </div>
+                        <MessageCircle className="w-5 h-5 text-green-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
         {/* Send Message Modal */}
-        <Dialog open={showSendModal} onOpenChange={setShowSendModal}>
+        <Dialog open={showSendModal || (showVendorModal && selectedVendor)} onOpenChange={(open) => {
+          if (!open) {
+            setShowSendModal(false);
+            setShowVendorModal(false);
+            setSelectedVendor(null);
+            setMessageData({
+              recipient_phone: '',
+              recipient_name: '',
+              message_content: '',
+              event_id: ''
+            });
+          }
+        }}>
           <DialogContent className="max-w-lg mx-auto bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-gray-800 mb-4">
-                Send WhatsApp Message
+                {selectedVendor ? `Message ${selectedVendor.name}` : 'Send WhatsApp Message'}
               </DialogTitle>
             </DialogHeader>
             
@@ -300,7 +446,7 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
 
               <div className="space-y-2">
                 <Label>Message Templates</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
                   {messageTemplates.map((template, index) => (
                     <Button
                       key={index}
@@ -308,7 +454,7 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
                       variant="outline"
                       size="sm"
                       onClick={() => useTemplate(template.content)}
-                      className="text-left justify-start h-auto p-2"
+                      className="text-left justify-start h-auto p-2 text-xs"
                     >
                       {template.name}
                     </Button>
@@ -332,7 +478,11 @@ export const WhatsAppIntegrationPage = ({ onBack }: WhatsAppIntegrationPageProps
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setShowSendModal(false)}
+                  onClick={() => {
+                    setShowSendModal(false);
+                    setShowVendorModal(false);
+                    setSelectedVendor(null);
+                  }}
                   className="flex-1"
                 >
                   Cancel
