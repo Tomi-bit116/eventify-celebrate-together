@@ -1,10 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, Plus, BookOpen, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { ArrowLeft, Plus, Search, BookOpen } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +12,7 @@ import { VendorForm } from './VendorForm';
 
 interface VendorContactBookPageProps {
   onBack: () => void;
-  onWhatsAppMessage?: (vendor: any) => void;
+  onWhatsAppMessage: (vendor: Vendor) => void;
 }
 
 interface Vendor {
@@ -34,9 +33,9 @@ export const VendorContactBookPage = ({ onBack, onWhatsAppMessage }: VendorConta
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showForm, setShowForm] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingVendor, setEditingVendor] = useState<Vendor | null>(null);
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -54,7 +53,12 @@ export const VendorContactBookPage = ({ onBack, onWhatsAppMessage }: VendorConta
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching vendors:', error);
+        toast.error('Failed to load vendors');
+        return;
+      }
+
       setVendors(data || []);
     } catch (error) {
       console.error('Error fetching vendors:', error);
@@ -64,37 +68,38 @@ export const VendorContactBookPage = ({ onBack, onWhatsAppMessage }: VendorConta
     }
   };
 
-  const handleAddVendor = async (vendorData: Omit<Vendor, 'id' | 'created_at' | 'event_id'>) => {
+  const handleAddVendor = async (vendorData: Omit<Vendor, 'id' | 'event_id' | 'created_at'>) => {
     if (!user) return;
 
-    setSubmitting(true);
     try {
       const { data, error } = await supabase
         .from('vendors')
         .insert({
           ...vendorData,
-          user_id: user.id
+          user_id: user.id,
+          event_id: null
         })
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding vendor:', error);
+        toast.error('Failed to add vendor');
+        return;
+      }
 
       setVendors([data, ...vendors]);
       toast.success('Vendor added successfully');
-      setShowForm(false);
+      setIsAddModalOpen(false);
     } catch (error) {
       console.error('Error adding vendor:', error);
       toast.error('Failed to add vendor');
-    } finally {
-      setSubmitting(false);
     }
   };
 
-  const handleUpdateVendor = async (vendorData: Omit<Vendor, 'id' | 'created_at' | 'event_id'>) => {
+  const handleEditVendor = async (vendorData: Omit<Vendor, 'id' | 'event_id' | 'created_at'>) => {
     if (!user || !editingVendor) return;
 
-    setSubmitting(true);
     try {
       const { data, error } = await supabase
         .from('vendors')
@@ -104,17 +109,19 @@ export const VendorContactBookPage = ({ onBack, onWhatsAppMessage }: VendorConta
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating vendor:', error);
+        toast.error('Failed to update vendor');
+        return;
+      }
 
       setVendors(vendors.map(v => v.id === editingVendor.id ? data : v));
       toast.success('Vendor updated successfully');
+      setIsEditModalOpen(false);
       setEditingVendor(null);
-      setShowForm(false);
     } catch (error) {
       console.error('Error updating vendor:', error);
       toast.error('Failed to update vendor');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -128,7 +135,11 @@ export const VendorContactBookPage = ({ onBack, onWhatsAppMessage }: VendorConta
         .eq('id', vendorId)
         .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting vendor:', error);
+        toast.error('Failed to delete vendor');
+        return;
+      }
 
       setVendors(vendors.filter(v => v.id !== vendorId));
       toast.success('Vendor deleted successfully');
@@ -138,16 +149,9 @@ export const VendorContactBookPage = ({ onBack, onWhatsAppMessage }: VendorConta
     }
   };
 
-  const handleWhatsApp = (vendor: Vendor) => {
-    if (onWhatsAppMessage) {
-      onWhatsAppMessage(vendor);
-    } else {
-      // Fallback to direct WhatsApp link
-      const message = `Hi ${vendor.name}, I hope you're doing well!`;
-      const phoneNumber = vendor.contact_phone.replace(/\D/g, '');
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
-    }
+  const openEditModal = (vendor: Vendor) => {
+    setEditingVendor(vendor);
+    setIsEditModalOpen(true);
   };
 
   const filteredVendors = vendors.filter(vendor =>
@@ -157,9 +161,9 @@ export const VendorContactBookPage = ({ onBack, onWhatsAppMessage }: VendorConta
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-green-50 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 p-4 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading vendors...</p>
         </div>
       </div>
@@ -167,7 +171,7 @@ export const VendorContactBookPage = ({ onBack, onWhatsAppMessage }: VendorConta
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-green-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
@@ -175,36 +179,36 @@ export const VendorContactBookPage = ({ onBack, onWhatsAppMessage }: VendorConta
             <Button 
               onClick={onBack}
               variant="ghost" 
-              className="mr-4 hover:bg-orange-100"
+              className="mr-4 hover:bg-purple-100"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Dashboard
             </Button>
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-yellow-500 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Vendor Contact Book
               </h1>
             </div>
           </div>
           
           <Button 
-            onClick={() => setShowForm(true)}
-            className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white w-full sm:w-auto"
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Vendor
           </Button>
         </div>
 
-        {/* Search */}
+        {/* Search Bar */}
         <div className="mb-6">
-          <div className="relative">
+          <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
-              placeholder="Search vendors by name or service type..."
+              placeholder="Search vendors or services..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 bg-white/90 backdrop-blur-sm"
@@ -214,72 +218,79 @@ export const VendorContactBookPage = ({ onBack, onWhatsAppMessage }: VendorConta
 
         {/* Vendors Grid */}
         {filteredVendors.length === 0 ? (
-          <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
-            <CardContent className="p-12 text-center">
-              <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                {searchTerm ? 'No vendors found' : 'No vendors yet'}
-              </h3>
-              <p className="text-gray-600 mb-6">
-                {searchTerm 
-                  ? 'Try adjusting your search terms'
-                  : 'Add your first vendor to start building your contact book!'
-                }
-              </p>
-              {!searchTerm && (
-                <Button 
-                  onClick={() => setShowForm(true)}
-                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add First Vendor
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+          <div className="text-center py-12">
+            <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="w-12 h-12 text-purple-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              {searchTerm ? 'No vendors found' : 'No vendors yet'}
+            </h3>
+            <p className="text-gray-500 mb-4">
+              {searchTerm 
+                ? 'Try adjusting your search terms' 
+                : 'Start building your vendor network by adding your first contact'
+              }
+            </p>
+            {!searchTerm && (
+              <Button 
+                onClick={() => setIsAddModalOpen(true)}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Your First Vendor
+              </Button>
+            )}
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVendors.map((vendor) => (
               <VendorCard
                 key={vendor.id}
                 vendor={vendor}
-                onEdit={(vendor) => {
-                  setEditingVendor(vendor);
-                  setShowForm(true);
-                }}
+                onEdit={openEditModal}
                 onDelete={handleDeleteVendor}
-                onWhatsApp={handleWhatsApp}
+                onWhatsApp={onWhatsAppMessage}
               />
             ))}
           </div>
         )}
+      </div>
 
-        {/* Add/Edit Vendor Modal */}
-        <Dialog open={showForm} onOpenChange={(open) => {
-          setShowForm(open);
-          if (!open) {
-            setEditingVendor(null);
-          }
-        }}>
-          <DialogContent className="max-w-2xl mx-auto bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-gray-800 mb-4">
-                {editingVendor ? 'Edit Vendor' : 'Add New Vendor'}
-              </DialogTitle>
-            </DialogHeader>
-            
+      {/* Add Vendor Modal */}
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        <DialogContent className="max-w-2xl mx-auto bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-gray-800">
+              Add New Vendor
+            </DialogTitle>
+          </DialogHeader>
+          <VendorForm
+            onSubmit={handleAddVendor}
+            onCancel={() => setIsAddModalOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Vendor Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="max-w-2xl mx-auto bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-gray-800">
+              Edit Vendor
+            </DialogTitle>
+          </DialogHeader>
+          {editingVendor && (
             <VendorForm
-              vendor={editingVendor || undefined}
-              onSubmit={editingVendor ? handleUpdateVendor : handleAddVendor}
+              vendor={editingVendor}
+              onSubmit={handleEditVendor}
               onCancel={() => {
-                setShowForm(false);
+                setIsEditModalOpen(false);
                 setEditingVendor(null);
               }}
-              loading={submitting}
             />
-          </DialogContent>
-        </Dialog>
-      </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

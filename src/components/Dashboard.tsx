@@ -19,6 +19,9 @@ import { SettingsPage } from '@/components/dashboard/SettingsPage';
 import { SharedAccessPage } from '@/components/dashboard/SharedAccessPage';
 import { VendorContactBookPage } from '@/components/dashboard/VendorContactBookPage';
 import { WhatsAppIntegrationPage } from '@/components/dashboard/WhatsAppIntegrationPage';
+import { QuickStartGuide } from '@/components/dashboard/QuickStartGuide';
+import { EditEventModal } from '@/components/dashboard/EditEventModal';
+import { SocialShareModal } from '@/components/dashboard/SocialShareModal';
 
 export const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -31,6 +34,9 @@ export const Dashboard = () => {
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [isInviteGuestsModalOpen, setIsInviteGuestsModalOpen] = useState(false);
   const [isBudgetTrackerOpen, setIsBudgetTrackerOpen] = useState(false);
+  const [isQuickStartOpen, setIsQuickStartOpen] = useState(!currentEvent); // Show for new users
+  const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
+  const [isSocialShareModalOpen, setIsSocialShareModalOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -101,6 +107,12 @@ export const Dashboard = () => {
     setCurrentEvent(eventData);
     toast.success(`Event "${eventData.name}" created successfully!`);
     setIsCreateEventModalOpen(false);
+    setIsQuickStartOpen(false); // Close quick start after creating first event
+  };
+
+  const handleEventUpdated = (eventData: any) => {
+    setCurrentEvent(eventData);
+    toast.success(`Event "${eventData.name}" updated successfully!`);
   };
 
   const handleBackToDashboard = () => {
@@ -111,6 +123,35 @@ export const Dashboard = () => {
     setCurrentEvent(event);
     setActiveFeature(null);
     toast.success(`Now managing: ${event.name}`);
+  };
+
+  const handleQuickStartAction = (action: string) => {
+    switch (action) {
+      case 'create-event':
+        setIsCreateEventModalOpen(true);
+        break;
+      case 'invite-guests':
+        if (currentEvent) {
+          setActiveFeature('invite-guests');
+        } else {
+          setIsCreateEventModalOpen(true);
+        }
+        break;
+      case 'manage-budget':
+        if (currentEvent) {
+          setIsBudgetTrackerOpen(true);
+        } else {
+          setIsCreateEventModalOpen(true);
+        }
+        break;
+      case 'share-event':
+        if (currentEvent) {
+          setIsSocialShareModalOpen(true);
+        } else {
+          setIsCreateEventModalOpen(true);
+        }
+        break;
+    }
   };
 
   const progressData = [
@@ -197,6 +238,30 @@ export const Dashboard = () => {
             <span className="text-xs text-gray-500 -mt-1">Plan with confidence</span>
           </div>
         </div>
+        
+        {/* Header Actions */}
+        <div className="flex items-center space-x-2">
+          {currentEvent && (
+            <>
+              <Button
+                onClick={() => setIsEditEventModalOpen(true)}
+                variant="ghost"
+                size="sm"
+                className="hidden sm:flex hover:bg-orange-100"
+              >
+                Edit Event
+              </Button>
+              <Button
+                onClick={() => setIsSocialShareModalOpen(true)}
+                variant="ghost"
+                size="sm"
+                className="hidden sm:flex hover:bg-orange-100"
+              >
+                Share Event
+              </Button>
+            </>
+          )}
+        </div>
       </header>
       
       <div className="flex h-[calc(100vh-80px)] pt-20">
@@ -218,6 +283,40 @@ export const Dashboard = () => {
                   {currentEvent ? `Currently planning: ${currentEvent.name}` : 'Ready to plan your next amazing celebration?'}
                 </p>
               </div>
+              
+              {/* Quick Actions */}
+              <div className="flex gap-2">
+                {!currentEvent && (
+                  <Button
+                    onClick={() => setIsQuickStartOpen(true)}
+                    variant="outline"
+                    size="sm"
+                    className="hover:bg-orange-100"
+                  >
+                    Quick Start Guide
+                  </Button>
+                )}
+                {currentEvent && (
+                  <>
+                    <Button
+                      onClick={() => setIsEditEventModalOpen(true)}
+                      variant="outline"
+                      size="sm"
+                      className="hover:bg-blue-100 sm:hidden"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      onClick={() => setIsSocialShareModalOpen(true)}
+                      variant="outline"
+                      size="sm"
+                      className="hover:bg-green-100 sm:hidden"
+                    >
+                      Share
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
             
             {/* Current Event Info */}
@@ -232,15 +331,15 @@ export const Dashboard = () => {
                     </div>
                     <div>
                       <span className="text-gray-600">Date:</span>
-                      <p className="font-medium">{currentEvent.date}</p>
+                      <p className="font-medium">{currentEvent.event_date}</p>
                     </div>
                     <div>
                       <span className="text-gray-600">Venue:</span>
-                      <p className="font-medium">{currentEvent.venue}</p>
+                      <p className="font-medium">{currentEvent.venue || 'Not set'}</p>
                     </div>
                     <div>
                       <span className="text-gray-600">Expected Guests:</span>
-                      <p className="font-medium">{currentEvent.expected_guests}</p>
+                      <p className="font-medium">{currentEvent.expected_guests || 0}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -325,6 +424,28 @@ export const Dashboard = () => {
         isOpen={isBudgetTrackerOpen}
         onClose={() => setIsBudgetTrackerOpen(false)}
         eventData={currentEvent}
+      />
+
+      <QuickStartGuide
+        isOpen={isQuickStartOpen}
+        onClose={() => setIsQuickStartOpen(false)}
+        onCreateEvent={() => handleQuickStartAction('create-event')}
+        onInviteGuests={() => handleQuickStartAction('invite-guests')}
+        onManageBudget={() => handleQuickStartAction('manage-budget')}
+        onShareEvent={() => handleQuickStartAction('share-event')}
+      />
+
+      <EditEventModal
+        isOpen={isEditEventModalOpen}
+        onClose={() => setIsEditEventModalOpen(false)}
+        event={currentEvent}
+        onEventUpdated={handleEventUpdated}
+      />
+
+      <SocialShareModal
+        isOpen={isSocialShareModalOpen}
+        onClose={() => setIsSocialShareModalOpen(false)}
+        event={currentEvent}
       />
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onAuthSuccess={() => {}} />

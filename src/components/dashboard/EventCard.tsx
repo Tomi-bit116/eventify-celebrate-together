@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, MapPin, Users, Settings, Trash2 } from 'lucide-react';
+import { Calendar, MapPin, Users, Settings, Trash2, Edit, Share2 } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -19,9 +19,17 @@ interface EventCardProps {
   event: Event;
   onEventSelect: (event: Event) => void;
   onDeleteEvent: (eventId: string) => void;
+  onEditEvent?: (event: Event) => void;
+  onShareEvent?: (event: Event) => void;
 }
 
-export const EventCard = ({ event, onEventSelect, onDeleteEvent }: EventCardProps) => {
+export const EventCard = ({ 
+  event, 
+  onEventSelect, 
+  onDeleteEvent, 
+  onEditEvent, 
+  onShareEvent 
+}: EventCardProps) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       weekday: 'long',
@@ -36,20 +44,56 @@ export const EventCard = ({ event, onEventSelect, onDeleteEvent }: EventCardProp
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span className="text-lg font-bold text-gray-800 truncate">{event.name}</span>
-          <div className="flex space-x-2">
+          <div className="flex space-x-1">
+            {onShareEvent && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onShareEvent(event);
+                }}
+                className="hover:bg-green-100 text-green-600"
+                title="Share Event"
+              >
+                <Share2 className="w-4 h-4" />
+              </Button>
+            )}
+            {onEditEvent && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditEvent(event);
+                }}
+                className="hover:bg-yellow-100 text-yellow-600"
+                title="Edit Event"
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onEventSelect(event)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEventSelect(event);
+              }}
               className="hover:bg-blue-100"
+              title="Manage Event"
             >
               <Settings className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onDeleteEvent(event.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteEvent(event.id);
+              }}
               className="hover:bg-red-100 text-red-600"
+              title="Delete Event"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
