@@ -139,7 +139,7 @@ export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) =>
 
   return (
     <>
-      {/* Mobile Menu Button - Moved to right side */}
+      {/* Mobile Menu Button */}
       <Button
         onClick={onToggle}
         className="lg:hidden fixed top-4 right-4 z-50 bg-gradient-to-r from-yellow-500 to-lime-500 text-white p-2 rounded-full shadow-lg"
@@ -155,7 +155,7 @@ export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) =>
         />
       )}
 
-      {/* Mobile Sliding Menu */}
+      {/* Menu */}
       <div className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 z-40 overflow-y-auto ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:relative lg:translate-x-0 lg:w-64 lg:shadow-none lg:bg-transparent`}>
