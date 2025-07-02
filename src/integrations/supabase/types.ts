@@ -9,6 +9,142 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      collaborators: {
+        Row: {
+          collaborator_email: string
+          collaborator_name: string
+          created_at: string
+          event_id: string | null
+          id: string
+          invited_by: string
+          role: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          collaborator_email: string
+          collaborator_name: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          invited_by: string
+          role?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          collaborator_email?: string
+          collaborator_name?: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          invited_by?: string
+          role?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collaborators_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          budget: number | null
+          created_at: string
+          description: string | null
+          event_date: string
+          event_time: string | null
+          expected_guests: number | null
+          id: string
+          name: string
+          status: string | null
+          updated_at: string
+          user_id: string
+          venue: string | null
+        }
+        Insert: {
+          budget?: number | null
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_time?: string | null
+          expected_guests?: number | null
+          id?: string
+          name: string
+          status?: string | null
+          updated_at?: string
+          user_id: string
+          venue?: string | null
+        }
+        Update: {
+          budget?: number | null
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_time?: string | null
+          expected_guests?: number | null
+          id?: string
+          name?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+          venue?: string | null
+        }
+        Relationships: []
+      }
+      guests: {
+        Row: {
+          created_at: string
+          email: string | null
+          event_id: string | null
+          id: string
+          name: string
+          phone: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          event_id?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          event_id?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guests_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -36,12 +172,180 @@ export type Database = {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          completed: boolean | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          event_id: string | null
+          id: string
+          priority: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          event_id?: string | null
+          id?: string
+          priority?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          event_id?: string | null
+          id?: string
+          priority?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendors: {
+        Row: {
+          amount: number | null
+          contact_email: string | null
+          contact_phone: string
+          created_at: string
+          event_id: string | null
+          id: string
+          name: string
+          notes: string | null
+          payment_status: string | null
+          service_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          contact_email?: string | null
+          contact_phone: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          payment_status?: string | null
+          service_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          contact_email?: string | null
+          contact_phone?: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          payment_status?: string | null
+          service_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendors_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_messages: {
+        Row: {
+          event_id: string | null
+          id: string
+          message_content: string
+          recipient_name: string | null
+          recipient_phone: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          event_id?: string | null
+          id?: string
+          message_content: string
+          recipient_name?: string | null
+          recipient_phone: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          event_id?: string | null
+          id?: string
+          message_content?: string
+          recipient_name?: string | null
+          recipient_phone?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_user_event: {
+        Args: { event_id_param: string; user_id_param: string }
+        Returns: boolean
+      }
+      get_event_tasks: {
+        Args: { event_id_param: string; user_id_param: string }
+        Returns: {
+          id: string
+          title: string
+          description: string
+          due_date: string
+          completed: boolean
+          priority: string
+          created_at: string
+        }[]
+      }
+      get_user_events: {
+        Args: { user_id_param: string }
+        Returns: {
+          id: string
+          name: string
+          description: string
+          event_date: string
+          event_time: string
+          venue: string
+          expected_guests: number
+          budget: number
+          status: string
+          created_at: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

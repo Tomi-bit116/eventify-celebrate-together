@@ -17,8 +17,8 @@ interface Event {
   id: string;
   name: string;
   description: string;
-  date: string;
-  time: string;
+  event_date: string;
+  event_time: string;
   venue: string;
   expected_guests: number;
   budget: number;
@@ -31,70 +31,58 @@ export const MyEventsPage = ({ onBack, onEventSelect, onCreateEvent }: MyEventsP
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchEvents();
+    if (user) {
+      fetchEvents();
+    }
   }, [user]);
 
   const fetchEvents = async () => {
     if (!user) return;
     
     try {
-      console.log('Events table not ready yet, using mock data');
-      // Use mock data when the table doesn't exist yet
-      setEvents([
-        {
-          id: '1',
-          name: 'Sample Birthday Party',
-          description: 'A wonderful birthday celebration',
-          date: '2024-02-15',
-          time: '18:00',
-          venue: 'Party Hall Downtown',
-          expected_guests: 25,
-          budget: 1500,
-          created_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          name: 'Wedding Anniversary',
-          description: 'Celebrating 10 years together',
-          date: '2024-03-20',
-          time: '19:30',
-          venue: 'Garden Restaurant',
-          expected_guests: 50,
-          budget: 3000,
-          created_at: new Date().toISOString()
-        }
-      ]);
+      const { data, error } = await supabase.rpc('get_user_events', {
+        user_id_param: user.id
+      });
+
+      if (error) {
+        console.error('Error fetching events:', error);
+        toast.error('Failed to load events');
+        return;
+      }
+
+      setEvents(data || []);
     } catch (error) {
       console.error('Error fetching events:', error);
-      // Fallback to mock data
-      setEvents([
-        {
-          id: '1',
-          name: 'Sample Birthday Party',
-          description: 'A wonderful birthday celebration',
-          date: '2024-02-15',
-          time: '18:00',
-          venue: 'Party Hall Downtown',
-          expected_guests: 25,
-          budget: 1500,
-          created_at: new Date().toISOString()
-        }
-      ]);
+      toast.error('Failed to load events');
     } finally {
       setLoading(false);
     }
   };
 
   const deleteEvent = async (eventId: string) => {
+    if (!user) return;
+
     try {
-      console.log('Delete operation not available yet');
-      toast.error('Delete functionality will be available once database is fully set up');
-      return;
+      const { data, error } = await supabase.rpc('delete_user_event', {
+        event_id_param: eventId,
+        user_id_param: user.id
+      });
+
+      if (error) {
+        console.error('Error deleting event:', error);
+        toast.error('Failed to delete event');
+        return;
+      }
+
+      if (data) {
+        setEvents(events.filter(event => event.id !== eventId));
+        toast.success('Event deleted successfully');
+      } else {
+        toast.error('Event not found or you do not have permission to delete it');
+      }
     } catch (error) {
       console.error('Error deleting event:', error);
-      // For now, just remove from local state for demo purposes
-      setEvents(events.filter(event => event.id !== eventId));
-      toast.success('Event removed from view');
+      toast.error('Failed to delete event');
     }
   };
 
@@ -199,8 +187,8 @@ export const MyEventsPage = ({ onBack, onEventSelect, onCreateEvent }: MyEventsP
                   
                   <div className="flex items-center text-sm text-gray-600">
                     <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-                    <span>{formatDate(event.date)}</span>
-                    {event.time && <span className="ml-2">at {event.time}</span>}
+                    <span>{formatDate(event.event_date)}</span>
+                    {event.event_time && <span className="ml-2">at {event.event_time}</span>}
                   </div>
                   
                   {event.venue && (
