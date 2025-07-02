@@ -17,6 +17,9 @@ import { TaskChecklistPage } from '@/components/dashboard/TaskChecklistPage';
 import { MyEventsPage } from '@/components/dashboard/MyEventsPage';
 import { TimelinePage } from '@/components/dashboard/TimelinePage';
 import { SettingsPage } from '@/components/dashboard/SettingsPage';
+import { SharedAccessPage } from '@/components/dashboard/SharedAccessPage';
+import { VendorContactBookPage } from '@/components/dashboard/VendorContactBookPage';
+import { WhatsAppIntegrationPage } from '@/components/dashboard/WhatsAppIntegrationPage';
 
 export const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -79,6 +82,15 @@ export const Dashboard = () => {
         break;
       case 'settings':
         setActiveFeature('settings');
+        break;
+      case 'shared-access':
+        setActiveFeature('shared-access');
+        break;
+      case 'vendor-contact-book':
+        setActiveFeature('vendor-contact-book');
+        break;
+      case 'whatsapp-integration':
+        setActiveFeature('whatsapp-integration');
         break;
       default:
         // For other features, just update the active feature
@@ -150,6 +162,18 @@ export const Dashboard = () => {
     return <SettingsPage onBack={handleBackToDashboard} />;
   }
 
+  if (activeFeature === 'shared-access') {
+    return <SharedAccessPage onBack={handleBackToDashboard} />;
+  }
+
+  if (activeFeature === 'vendor-contact-book') {
+    return <VendorContactBookPage onBack={handleBackToDashboard} />;
+  }
+
+  if (activeFeature === 'whatsapp-integration') {
+    return <WhatsAppIntegrationPage onBack={handleBackToDashboard} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50">
       {/* Header Section */}
@@ -182,12 +206,12 @@ export const Dashboard = () => {
           onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         />
         
-        <main className="flex-1 p-6 overflow-y-auto lg:ml-0">
+        <main className="flex-1 p-4 sm:p-6 overflow-y-auto lg:ml-0">
           {/* Welcome Section */}
           <div className="mb-8">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                   Welcome back{user?.user_metadata?.display_name ? `, ${user.user_metadata.display_name}` : ''}! 🎉
                 </h1>
                 <p className="text-gray-600">
@@ -197,7 +221,7 @@ export const Dashboard = () => {
               <Button
                 onClick={handleSignOut}
                 variant="outline"
-                className="md:hidden flex items-center gap-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50"
+                className="md:hidden flex items-center gap-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50 w-full sm:w-auto"
               >
                 Sign Out
               </Button>
@@ -206,9 +230,9 @@ export const Dashboard = () => {
             {/* Current Event Info */}
             {currentEvent && (
               <Card className="mb-6 border-0 shadow-md bg-gradient-to-r from-blue-50 to-indigo-50">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">Current Event</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                     <div>
                       <span className="text-gray-600">Name:</span>
                       <p className="font-medium">{currentEvent.name}</p>
@@ -246,7 +270,7 @@ export const Dashboard = () => {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {quickStats.map((stat, index) => (
                 <Card key={index} className="border-0 shadow-md hover:shadow-lg transition-all duration-300">
                   <CardContent className="p-4 flex items-center space-x-3">
@@ -254,8 +278,8 @@ export const Dashboard = () => {
                       <stat.icon className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-800">{stat.label}</h4>
-                      <p className="text-sm text-gray-600">{stat.value}</p>
+                      <h4 className="font-medium text-gray-800 text-sm">{stat.label}</h4>
+                      <p className="text-xs text-gray-600">{stat.value}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -264,8 +288,8 @@ export const Dashboard = () => {
           </div>
 
           {/* Main Content Area */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
               {activeFeature ? `Feature: ${activeFeature}` : currentEvent ? `${currentEvent.name} Dashboard` : 'Dashboard Overview'}
             </h2>
             <p className="text-gray-600 mb-6">
@@ -281,7 +305,7 @@ export const Dashboard = () => {
               <div className="text-center py-8">
                 <Button 
                   onClick={() => setIsCreateEventModalOpen(true)}
-                  className="bg-gradient-to-r from-yellow-500 to-green-500 hover:from-yellow-600 hover:to-green-600 text-white px-8 py-3 text-lg"
+                  className="bg-gradient-to-r from-yellow-500 to-green-500 hover:from-yellow-600 hover:to-green-600 text-white px-6 sm:px-8 py-3 text-base sm:text-lg"
                 >
                   Create Your First Event
                 </Button>
