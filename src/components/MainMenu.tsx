@@ -17,7 +17,9 @@ import {
   Calendar,
   Clock,
   Settings,
-  LogOut
+  LogOut,
+  Edit,
+  Share2
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -26,9 +28,19 @@ interface MainMenuProps {
   onFeatureClick: (feature: string) => void;
   isOpen: boolean;
   onToggle: () => void;
+  currentEvent?: any;
+  onEditEvent?: () => void;
+  onShareEvent?: () => void;
 }
 
-export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) => {
+export const MainMenu = ({ 
+  onFeatureClick, 
+  isOpen, 
+  onToggle, 
+  currentEvent,
+  onEditEvent,
+  onShareEvent 
+}: MainMenuProps) => {
   const { signOut } = useAuth();
 
   const handleSignOut = async () => {
@@ -92,8 +104,8 @@ export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) =>
     },
     {
       id: 'task-checklist',
-      title: 'Task Checklist',
-      description: 'Track progress with deadlines',
+      title: 'Task Checklist & Timeline',
+      description: 'Track progress with deadlines and timeline',
       icon: CheckSquare,
       color: 'from-yellow-500 to-lime-600'
     },
@@ -130,8 +142,33 @@ export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) =>
     }
   ];
 
-  const handleItemClick = (itemId: string) => {
-    onFeatureClick(itemId);
+  // Event-specific quick access items (only show when event is selected)
+  const eventQuickAccessItems = currentEvent ? [
+    {
+      id: 'edit-event',
+      title: 'Edit Event',
+      description: 'Modify event details',
+      icon: Edit,
+      color: 'from-blue-400 to-indigo-400',
+      action: onEditEvent
+    },
+    {
+      id: 'share-event',
+      title: 'Share Event',
+      description: 'Share on social media',
+      icon: Share2,
+      color: 'from-purple-400 to-pink-400',
+      action: onShareEvent
+    }
+  ] : [];
+
+  const handleItemClick = (itemId: string, customAction?: () => void) => {
+    if (customAction) {
+      customAction();
+    } else {
+      onFeatureClick(itemId);
+    }
+    
     if (window.innerWidth < 1024) {
       onToggle();
     }
@@ -193,11 +230,34 @@ export const MainMenu = ({ onFeatureClick, isOpen, onToggle }: MainMenuProps) =>
         {/* Quick Access Section */}
         <div className="p-4 border-t border-gray-200">
           <h3 className="font-semibold text-gray-700 mb-3">Quick Access</h3>
+          
+          {/* Regular Quick Access Items */}
           {quickAccessItems.map((item) => (
             <Card
               key={item.id}
               className="cursor-pointer hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-r from-green-50 to-lime-50 hover:from-green-100 hover:to-lime-100 mb-2"
               onClick={() => handleItemClick(item.id)}
+            >
+              <CardContent className="p-3">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center`}>
+                    <item.icon className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-800 text-sm">{item.title}</h4>
+                    <p className="text-xs text-gray-600">{item.description}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+
+          {/* Event-Specific Quick Access Items */}
+          {eventQuickAccessItems.map((item) => (
+            <Card
+              key={item.id}
+              className="cursor-pointer hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 mb-2"
+              onClick={() => handleItemClick(item.id, item.action)}
             >
               <CardContent className="p-3">
                 <div className="flex items-center space-x-3">

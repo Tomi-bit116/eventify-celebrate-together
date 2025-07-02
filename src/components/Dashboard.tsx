@@ -3,7 +3,7 @@ import { MainMenu } from '@/components/MainMenu';
 import { AuthModal } from '@/components/AuthModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Clock, CheckSquare, ListChecks } from 'lucide-react';
+import { Calendar, Clock, CheckSquare, ListChecks, Edit, Share2, MapPin, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreateEventModal } from '@/components/dashboard/CreateEventModal';
@@ -22,6 +22,7 @@ import { WhatsAppIntegrationPage } from '@/components/dashboard/WhatsAppIntegrat
 import { QuickStartGuide } from '@/components/dashboard/QuickStartGuide';
 import { EditEventModal } from '@/components/dashboard/EditEventModal';
 import { SocialShareModal } from '@/components/dashboard/SocialShareModal';
+import { InteractiveSettingsPage } from '@/components/dashboard/InteractiveSettingsPage';
 
 export const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -34,7 +35,11 @@ export const Dashboard = () => {
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [isInviteGuestsModalOpen, setIsInviteGuestsModalOpen] = useState(false);
   const [isBudgetTrackerOpen, setIsBudgetTrackerOpen] = useState(false);
-  const [isQuickStartOpen, setIsQuickStartOpen] = useState(!currentEvent); // Show for new users
+  
+  // Check if user is new (no events created and quick start not completed)
+  const isNewUser = !currentEvent && !localStorage.getItem('quickStartCompleted');
+  const [isQuickStartOpen, setIsQuickStartOpen] = useState(isNewUser);
+  
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
   const [isSocialShareModalOpen, setIsSocialShareModalOpen] = useState(false);
 
@@ -98,7 +103,6 @@ export const Dashboard = () => {
         setActiveFeature('whatsapp-integration');
         break;
       default:
-        // For other features, just update the active feature
         break;
     }
   };
@@ -107,7 +111,8 @@ export const Dashboard = () => {
     setCurrentEvent(eventData);
     toast.success(`Event "${eventData.name}" created successfully!`);
     setIsCreateEventModalOpen(false);
-    setIsQuickStartOpen(false); // Close quick start after creating first event
+    setIsQuickStartOpen(false);
+    localStorage.setItem('quickStartCompleted', 'true');
   };
 
   const handleEventUpdated = (eventData: any) => {
@@ -199,7 +204,7 @@ export const Dashboard = () => {
   }
 
   if (activeFeature === 'settings') {
-    return <SettingsPage onBack={handleBackToDashboard} />;
+    return <InteractiveSettingsPage onBack={handleBackToDashboard} />;
   }
 
   if (activeFeature === 'shared-access') {
@@ -211,9 +216,7 @@ export const Dashboard = () => {
       <VendorContactBookPage 
         onBack={handleBackToDashboard}
         onWhatsAppMessage={(vendor) => {
-          // Switch to WhatsApp integration with pre-filled vendor data
           setActiveFeature('whatsapp-integration');
-          // Could pass vendor data here if needed
         }}
       />
     );
@@ -225,7 +228,7 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50">
-      {/* Header Section - Simplified without duplicate sign out */}
+      {/* Header Section */}
       <header className="fixed top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-b border-amber-100 shadow-sm h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
@@ -238,30 +241,6 @@ export const Dashboard = () => {
             <span className="text-xs text-gray-500 -mt-1">Plan with confidence</span>
           </div>
         </div>
-        
-        {/* Header Actions */}
-        <div className="flex items-center space-x-2">
-          {currentEvent && (
-            <>
-              <Button
-                onClick={() => setIsEditEventModalOpen(true)}
-                variant="ghost"
-                size="sm"
-                className="hidden sm:flex hover:bg-orange-100"
-              >
-                Edit Event
-              </Button>
-              <Button
-                onClick={() => setIsSocialShareModalOpen(true)}
-                variant="ghost"
-                size="sm"
-                className="hidden sm:flex hover:bg-orange-100"
-              >
-                Share Event
-              </Button>
-            </>
-          )}
-        </div>
       </header>
       
       <div className="flex h-[calc(100vh-80px)] pt-20">
@@ -269,6 +248,9 @@ export const Dashboard = () => {
           onFeatureClick={handleFeatureClick} 
           isOpen={isMobileMenuOpen}
           onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          currentEvent={currentEvent}
+          onEditEvent={() => setIsEditEventModalOpen(true)}
+          onShareEvent={() => setIsSocialShareModalOpen(true)}
         />
         
         <main className="flex-1 p-4 sm:p-6 overflow-y-auto lg:ml-0">
@@ -284,9 +266,9 @@ export const Dashboard = () => {
                 </p>
               </div>
               
-              {/* Quick Actions */}
+              {/* Quick Actions - Only show Quick Start Guide for new users */}
               <div className="flex gap-2">
-                {!currentEvent && (
+                {isNewUser && (
                   <Button
                     onClick={() => setIsQuickStartOpen(true)}
                     variant="outline"
@@ -296,50 +278,65 @@ export const Dashboard = () => {
                     Quick Start Guide
                   </Button>
                 )}
-                {currentEvent && (
-                  <>
-                    <Button
-                      onClick={() => setIsEditEventModalOpen(true)}
-                      variant="outline"
-                      size="sm"
-                      className="hover:bg-blue-100 sm:hidden"
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      onClick={() => setIsSocialShareModalOpen(true)}
-                      variant="outline"
-                      size="sm"
-                      className="hover:bg-green-100 sm:hidden"
-                    >
-                      Share
-                    </Button>
-                  </>
-                )}
               </div>
             </div>
             
-            {/* Current Event Info */}
+            {/* Enhanced Current Event Info */}
             {currentEvent && (
-              <Card className="mb-6 border-0 shadow-md bg-gradient-to-r from-blue-50 to-indigo-50">
-                <CardContent className="p-4 sm:p-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Current Event</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-600">Name:</span>
-                      <p className="font-medium">{currentEvent.name}</p>
+              <Card className="mb-6 border-0 shadow-lg bg-gradient-to-r from-blue-50 to-indigo-50 hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                    <h3 className="text-xl font-bold text-gray-800 mb-2 sm:mb-0">Current Event</h3>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => setIsEditEventModalOpen(true)}
+                        size="sm"
+                        variant="outline"
+                        className="hover:bg-blue-100"
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit
+                      </Button>
+                      <Button
+                        onClick={() => setIsSocialShareModalOpen(true)}
+                        size="sm"
+                        variant="outline"
+                        className="hover:bg-green-100"
+                      >
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Share
+                      </Button>
                     </div>
-                    <div>
-                      <span className="text-gray-600">Date:</span>
-                      <p className="font-medium">{currentEvent.event_date}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="flex items-center space-x-3">
+                      <Calendar className="w-5 h-5 text-blue-500" />
+                      <div>
+                        <span className="text-gray-600 text-sm">Event</span>
+                        <p className="font-semibold text-gray-800">{currentEvent.name}</p>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-gray-600">Venue:</span>
-                      <p className="font-medium">{currentEvent.venue || 'Not set'}</p>
+                    <div className="flex items-center space-x-3">
+                      <Clock className="w-5 h-5 text-green-500" />
+                      <div>
+                        <span className="text-gray-600 text-sm">Date</span>
+                        <p className="font-semibold text-gray-800">{currentEvent.event_date}</p>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-gray-600">Expected Guests:</span>
-                      <p className="font-medium">{currentEvent.expected_guests || 0}</p>
+                    <div className="flex items-center space-x-3">
+                      <MapPin className="w-5 h-5 text-purple-500" />
+                      <div>
+                        <span className="text-gray-600 text-sm">Venue</span>
+                        <p className="font-semibold text-gray-800">{currentEvent.venue || 'Not set'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Users className="w-5 h-5 text-orange-500" />
+                      <div>
+                        <span className="text-gray-600 text-sm">Guests</span>
+                        <p className="font-semibold text-gray-800">{currentEvent.expected_guests || 0}</p>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -353,7 +350,7 @@ export const Dashboard = () => {
                   <CardContent className="p-4">
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">{item.label}</h3>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className={`${item.color} h-2.5 rounded-full`} style={{ width: `${item.value}%` }}></div>
+                      <div className={`${item.color} h-2.5 rounded-full transition-all duration-300`} style={{ width: `${item.value}%` }}></div>
                     </div>
                     <p className="text-sm text-gray-500 mt-1">{item.value}% Complete</p>
                   </CardContent>
@@ -426,14 +423,20 @@ export const Dashboard = () => {
         eventData={currentEvent}
       />
 
-      <QuickStartGuide
-        isOpen={isQuickStartOpen}
-        onClose={() => setIsQuickStartOpen(false)}
-        onCreateEvent={() => handleQuickStartAction('create-event')}
-        onInviteGuests={() => handleQuickStartAction('invite-guests')}
-        onManageBudget={() => handleQuickStartAction('manage-budget')}
-        onShareEvent={() => handleQuickStartAction('share-event')}
-      />
+      {/* Only show Quick Start Guide for new users */}
+      {isNewUser && (
+        <QuickStartGuide
+          isOpen={isQuickStartOpen}
+          onClose={() => {
+            setIsQuickStartOpen(false);
+            localStorage.setItem('quickStartCompleted', 'true');
+          }}
+          onCreateEvent={() => handleQuickStartAction('create-event')}
+          onInviteGuests={() => handleQuickStartAction('invite-guests')}
+          onManageBudget={() => handleQuickStartAction('manage-budget')}
+          onShareEvent={() => handleQuickStartAction('share-event')}
+        />
+      )}
 
       <EditEventModal
         isOpen={isEditEventModalOpen}
