@@ -19,7 +19,7 @@ import { SettingsPage } from '@/components/dashboard/SettingsPage';
 import { SharedAccessPage } from '@/components/dashboard/SharedAccessPage';
 import { VendorContactBookPage } from '@/components/dashboard/VendorContactBookPage';
 import { WhatsAppIntegrationPage } from '@/components/dashboard/WhatsAppIntegrationPage';
-import { QuickStartGuide } from '@/components/dashboard/QuickStartGuide';
+import { CompactQuickStartGuide } from '@/components/dashboard/CompactQuickStartGuide';
 import { EditEventModal } from '@/components/dashboard/EditEventModal';
 import { SocialShareModal } from '@/components/dashboard/SocialShareModal';
 import { InteractiveSettingsPage } from '@/components/dashboard/InteractiveSettingsPage';
@@ -38,7 +38,8 @@ export const Dashboard = () => {
   
   // Check if user is new (no events created and quick start not completed)
   const isNewUser = !currentEvent && !localStorage.getItem('quickStartCompleted');
-  const [isQuickStartOpen, setIsQuickStartOpen] = useState(isNewUser);
+  const [isQuickStartOpen, setIsQuickStartOpen] = useState(false);
+  const [isCompactGuideVisible, setIsCompactGuideVisible] = useState(isNewUser);
   
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
   const [isSocialShareModalOpen, setIsSocialShareModalOpen] = useState(false);
@@ -111,7 +112,7 @@ export const Dashboard = () => {
     setCurrentEvent(eventData);
     toast.success(`Event "${eventData.name}" created successfully!`);
     setIsCreateEventModalOpen(false);
-    setIsQuickStartOpen(false);
+    setIsCompactGuideVisible(false);
     localStorage.setItem('quickStartCompleted', 'true');
   };
 
@@ -157,6 +158,11 @@ export const Dashboard = () => {
         }
         break;
     }
+  };
+
+  const handleCloseCompactGuide = () => {
+    setIsCompactGuideVisible(false);
+    localStorage.setItem('quickStartCompleted', 'true');
   };
 
   const progressData = [
@@ -264,20 +270,6 @@ export const Dashboard = () => {
                 <p className="text-gray-600">
                   {currentEvent ? `Currently planning: ${currentEvent.name}` : 'Ready to plan your next amazing celebration?'}
                 </p>
-              </div>
-              
-              {/* Quick Actions - Only show Quick Start Guide for new users */}
-              <div className="flex gap-2">
-                {isNewUser && (
-                  <Button
-                    onClick={() => setIsQuickStartOpen(true)}
-                    variant="outline"
-                    size="sm"
-                    className="hover:bg-orange-100"
-                  >
-                    Quick Start Guide
-                  </Button>
-                )}
               </div>
             </div>
             
@@ -423,21 +415,6 @@ export const Dashboard = () => {
         eventData={currentEvent}
       />
 
-      {/* Only show Quick Start Guide for new users */}
-      {isNewUser && (
-        <QuickStartGuide
-          isOpen={isQuickStartOpen}
-          onClose={() => {
-            setIsQuickStartOpen(false);
-            localStorage.setItem('quickStartCompleted', 'true');
-          }}
-          onCreateEvent={() => handleQuickStartAction('create-event')}
-          onInviteGuests={() => handleQuickStartAction('invite-guests')}
-          onManageBudget={() => handleQuickStartAction('manage-budget')}
-          onShareEvent={() => handleQuickStartAction('share-event')}
-        />
-      )}
-
       <EditEventModal
         isOpen={isEditEventModalOpen}
         onClose={() => setIsEditEventModalOpen(false)}
@@ -449,6 +426,16 @@ export const Dashboard = () => {
         isOpen={isSocialShareModalOpen}
         onClose={() => setIsSocialShareModalOpen(false)}
         event={currentEvent}
+      />
+
+      {/* Compact Quick Start Guide for new users */}
+      <CompactQuickStartGuide
+        isVisible={isCompactGuideVisible}
+        onClose={handleCloseCompactGuide}
+        onCreateEvent={() => handleQuickStartAction('create-event')}
+        onInviteGuests={() => handleQuickStartAction('invite-guests')}
+        onManageBudget={() => handleQuickStartAction('manage-budget')}
+        onShareEvent={() => handleQuickStartAction('share-event')}
       />
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onAuthSuccess={() => {}} />

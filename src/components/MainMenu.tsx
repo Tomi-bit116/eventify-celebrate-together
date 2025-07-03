@@ -104,8 +104,8 @@ export const MainMenu = ({
     },
     {
       id: 'task-checklist',
-      title: 'Task Checklist & Timeline',
-      description: 'Track progress with deadlines and timeline',
+      title: 'Task Checklist',
+      description: 'Track tasks and deadlines',
       icon: CheckSquare,
       color: 'from-yellow-500 to-lime-600'
     },

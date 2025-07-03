@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Users, Phone, Mail, MessageSquare, Instagram, Share2, Plus, Trash2, Download } from 'lucide-react';
+import { ArrowLeft, Users, Phone, Mail, MessageSquare, Instagram, Share2, Plus, Trash2, Download, Send, X, Facebook } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
 interface Guest {
@@ -25,6 +26,11 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
     { id: '2', name: 'Kemi Adeleke', phone: '+234 802 345 6789', email: 'kemi@email.com', status: 'pending' },
   ]);
   const [newGuest, setNewGuest] = useState({ name: '', phone: '', email: '' });
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [emailData, setEmailData] = useState({
+    subject: "You're Invited to Our Event!",
+    message: "Hi there! You're invited to our special celebration. We'd love to have you join us!"
+  });
 
   const handleAddGuest = () => {
     if (!newGuest.name || !newGuest.phone) {
@@ -60,13 +66,73 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
     toast.success(`Email invitation sent to ${guest.name}`);
   };
 
-  const removeGuest = (id: string) => {
-    setGuests(guests.filter(g => g.id !== id));
-    toast.success("Guest removed from list");
+  const handleBulkEmailInvitations = () => {
+    const guestsWithEmail = guests.filter(g => g.email);
+    if (guestsWithEmail.length === 0) {
+      toast.error("No guests with email addresses found");
+      return;
+    }
+    
+    const emailList = guestsWithEmail.map(g => g.email).join(',');
+    const emailUrl = `mailto:${emailList}?subject=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(emailData.message)}`;
+    window.open(emailUrl);
+    toast.success(`Email invitations sent to ${guestsWithEmail.length} guests!`);
+    setIsEmailModalOpen(false);
+  };
+
+  const handleSocialShare = (platform: string) => {
+    const eventText = "Join us for an amazing celebration! You're invited to our special event.";
+    const eventUrl = window.location.href;
+    
+    let shareUrl = '';
+    
+    switch (platform) {
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(eventText + ' ' + eventUrl)}`;
+        break;
+      case 'instagram':
+        // Instagram doesn't have direct sharing URLs, so we copy to clipboard
+        navigator.clipboard.writeText(eventText + ' ' + eventUrl);
+        toast.success("Event details copied! You can now paste it on Instagram.");
+        return;
+      case 'x':
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(eventText)}&url=${encodeURIComponent(eventUrl)}`;
+        break;
+      case 'tiktok':
+        navigator.clipboard.writeText(eventText + ' ' + eventUrl);
+        toast.success("Event details copied! You can now share it on TikTok.");
+        return;
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
+        break;
+    }
+    
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+      toast.success(`Shared on ${platform.charAt(0).toUpperCase() + platform.slice(1)}!`);
+    }
   };
 
   const handleImportContacts = () => {
-    toast.success("Contact import feature coming soon!");
+    // Simulate contact import
+    const newContacts = [
+      { name: 'John Doe', phone: '+234 901 234 5678', email: 'john@email.com' },
+      { name: 'Jane Smith', phone: '+234 902 345 6789', email: 'jane@email.com' }
+    ];
+    
+    const importedGuests = newContacts.map(contact => ({
+      id: Date.now().toString() + Math.random(),
+      ...contact,
+      status: 'pending' as const
+    }));
+    
+    setGuests([...guests, ...importedGuests]);
+    toast.success(`Imported ${newContacts.length} contacts successfully!`);
+  };
+
+  const removeGuest = (id: string) => {
+    setGuests(guests.filter(g => g.id !== id));
+    toast.success("Guest removed from list");
   };
 
   const handleCreateShareableLink = () => {
@@ -139,7 +205,7 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
             </CardContent>
           </Card>
 
-          {/* Quick Invite Options */}
+          {/* Enhanced Quick Invite Options */}
           <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center text-blue-700">
@@ -162,14 +228,48 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
                 <Share2 className="w-5 h-5 mr-2" />
                 Create Shareable Link
               </Button>
-              <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white">
-                <Instagram className="w-5 h-5 mr-2" />
-                Share on Social Media
-              </Button>
-              <Button className="w-full bg-purple-500 hover:bg-purple-600 text-white">
+              <Button 
+                onClick={() => setIsEmailModalOpen(true)}
+                className="w-full bg-purple-500 hover:bg-purple-600 text-white"
+              >
                 <Mail className="w-5 h-5 mr-2" />
                 Send Email Invitations
               </Button>
+              
+              {/* Social Media Sharing */}
+              <div className="border-t pt-3">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Share on Social Media</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    onClick={() => handleSocialShare('whatsapp')}
+                    className="bg-green-500 hover:bg-green-600 text-white text-xs"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-1" />
+                    WhatsApp
+                  </Button>
+                  <Button 
+                    onClick={() => handleSocialShare('instagram')}
+                    className="bg-pink-500 hover:bg-pink-600 text-white text-xs"
+                  >
+                    <Instagram className="w-4 h-4 mr-1" />
+                    Instagram
+                  </Button>
+                  <Button 
+                    onClick={() => handleSocialShare('x')}
+                    className="bg-black hover:bg-gray-800 text-white text-xs"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    X (Twitter)
+                  </Button>
+                  <Button 
+                    onClick={() => handleSocialShare('facebook')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
+                  >
+                    <Facebook className="w-4 h-4 mr-1" />
+                    Facebook
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -234,6 +334,50 @@ export const InviteGuestsPage = ({ onBack }: InviteGuestsPageProps) => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Email Invitation Modal */}
+        <Dialog open={isEmailModalOpen} onOpenChange={setIsEmailModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Send Email Invitations</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="emailSubject">Subject</Label>
+                <Input
+                  id="emailSubject"
+                  value={emailData.subject}
+                  onChange={(e) => setEmailData({...emailData, subject: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="emailMessage">Message</Label>
+                <textarea
+                  id="emailMessage"
+                  rows={4}
+                  className="w-full p-2 border rounded-lg"
+                  value={emailData.message}
+                  onChange={(e) => setEmailData({...emailData, message: e.target.value})}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleBulkEmailInvitations}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Send Invitations
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsEmailModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
