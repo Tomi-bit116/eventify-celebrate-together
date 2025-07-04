@@ -10,7 +10,7 @@ import {
   DollarSign,
   UserCheck,
   UserPlus, 
-  MessageCircle, 
+  MessageSquare, 
   FileText, 
   CheckSquare, 
   BookOpen,
@@ -92,7 +92,7 @@ export const MainMenu = ({
       id: 'whatsapp-integration',
       title: 'WhatsApp Integration',
       description: 'Share updates via WhatsApp',
-      icon: MessageCircle,
+      icon: MessageSquare,
       color: 'from-green-500 to-lime-600'
     },
     {
@@ -101,13 +101,6 @@ export const MainMenu = ({
       description: 'Pre-built templates for quick setup',
       icon: FileText,
       color: 'from-lime-500 to-emerald-600'
-    },
-    {
-      id: 'task-checklist',
-      title: 'Task Checklist',
-      description: 'Track tasks and deadlines',
-      icon: CheckSquare,
-      color: 'from-yellow-500 to-lime-600'
     },
     {
       id: 'vendor-contact-book',
@@ -132,6 +125,13 @@ export const MainMenu = ({
       description: 'Event planning timeline',
       icon: Clock,
       color: 'from-yellow-400 to-lime-400'
+    },
+    {
+      id: 'task-checklist',
+      title: 'Task Checklist',
+      description: 'Track tasks and deadlines',
+      icon: CheckSquare,
+      color: 'from-blue-400 to-green-400'
     },
     {
       id: 'settings',
