@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { X, Plus, Users, DollarSign, Share2, Sparkles } from 'lucide-react';
+import { X, Plus, Users, DollarSign, Share2, Sparkles, ChevronRight } from 'lucide-react';
 
 interface CompactQuickStartGuideProps {
   isVisible: boolean;
@@ -144,7 +144,7 @@ export const CompactQuickStartGuide = ({
                     size="sm"
                     className={`bg-gradient-to-r ${steps[currentStep].color} hover:opacity-90 text-white h-6 w-6 md:h-8 md:w-8 p-0`}
                   >
-                    <span className="text-xs md:text-sm">&rarr;</span>
+                    <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
                   </Button>
                 </div>
               </div>

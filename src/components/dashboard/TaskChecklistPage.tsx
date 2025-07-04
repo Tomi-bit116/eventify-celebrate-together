@@ -1,100 +1,71 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, CheckSquare, Plus, Calendar, Clock, AlertCircle, Check, Circle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowLeft, CheckSquare, Plus, Trash2, Clock, AlertCircle, CheckCircle2, Calendar, Link } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface TaskChecklistPageProps {
-  onBack: () => void;
-}
 
 interface Task {
   id: string;
   title: string;
   description: string;
-  priority: 'low' | 'medium' | 'high';
   dueDate: string;
-  completed: boolean;
-  category: string;
-}
-
-interface TimelineItem {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  type: 'task' | 'milestone' | 'deadline';
-  completed: boolean;
   priority: 'low' | 'medium' | 'high';
+  completed: boolean;
+  connectedToTimeline: boolean;
 }
 
-export const TaskChecklistPage = ({ onBack }: TaskChecklistPageProps) => {
+interface TaskChecklistPageProps {
+  onBack: () => void;
+  onViewTimeline?: () => void;
+}
+
+export const TaskChecklistPage = ({ onBack, onViewTimeline }: TaskChecklistPageProps) => {
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
-      title: 'Send out invitations',
-      description: 'Create and send digital invitations to all guests',
+      title: 'Book venue',
+      description: 'Research and book the perfect venue for the event',
+      dueDate: '2024-02-15',
       priority: 'high',
-      dueDate: '2024-02-01',
-      completed: true,
-      category: 'Invitations'
+      completed: false,
+      connectedToTimeline: true
     },
     {
       id: '2',
-      title: 'Book venue',
-      description: 'Confirm booking for Party Hall Downtown',
+      title: 'Send invitations',
+      description: 'Create and send invitations to all guests',
+      dueDate: '2024-02-20',
       priority: 'high',
-      dueDate: '2024-02-05',
       completed: true,
-      category: 'Venue'
+      connectedToTimeline: true
     },
     {
       id: '3',
-      title: 'Order cake',
-      description: 'Order custom birthday cake from local bakery',
+      title: 'Order decorations',
+      description: 'Purchase all necessary decorations and supplies',
+      dueDate: '2024-02-25',
       priority: 'medium',
-      dueDate: '2024-02-10',
       completed: false,
-      category: 'Catering'
+      connectedToTimeline: false
     }
   ]);
 
-  const [timelineItems, setTimelineItems] = useState<TimelineItem[]>([]);
-  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
-    priority: 'medium' as 'low' | 'medium' | 'high',
     dueDate: '',
-    category: ''
+    priority: 'medium' as 'low' | 'medium' | 'high'
   });
-  const [filter, setFilter] = useState<'all' | 'pending' | 'completed' | 'overdue'>('all');
 
-  useEffect(() => {
-    // Convert tasks to timeline items
-    const timeline = tasks.map(task => ({
-      id: task.id,
-      title: task.title,
-      description: task.description,
-      date: task.dueDate,
-      type: 'task' as const,
-      completed: task.completed,
-      priority: task.priority
-    }));
-    setTimelineItems(timeline);
-  }, [tasks]);
+  const [showAddTask, setShowAddTask] = useState(false);
 
   const handleAddTask = () => {
     if (!newTask.title.trim()) {
-      toast.error('Task title is required');
+      toast.error("Please enter a task title");
       return;
     }
 
@@ -102,337 +73,283 @@ export const TaskChecklistPage = ({ onBack }: TaskChecklistPageProps) => {
       id: Date.now().toString(),
       title: newTask.title,
       description: newTask.description,
-      priority: newTask.priority,
       dueDate: newTask.dueDate,
+      priority: newTask.priority,
       completed: false,
-      category: newTask.category
+      connectedToTimeline: false
     };
 
     setTasks([...tasks, task]);
-    setNewTask({
-      title: '',
-      description: '',
-      priority: 'medium',
-      dueDate: '',
-      category: ''
-    });
-    setIsAddTaskOpen(false);
-    toast.success('Task added successfully!');
+    setNewTask({ title: '', description: '', dueDate: '', priority: 'medium' });
+    setShowAddTask(false);
+    toast.success("Task added successfully!");
   };
 
-  const handleToggleTask = (taskId: string) => {
+  const toggleTaskComplete = (taskId: string) => {
     setTasks(tasks.map(task => 
-      task.id === taskId 
-        ? { ...task, completed: !task.completed }
-        : task
+      task.id === taskId ? { ...task, completed: !task.completed } : task
     ));
     const task = tasks.find(t => t.id === taskId);
-    if (task) {
-      toast.success(`Task "${task.title}" ${task.completed ? 'reopened' : 'completed'}!`);
-    }
+    toast.success(`Task "${task?.title}" ${task?.completed ? 'marked as incomplete' : 'completed'}!`);
   };
 
-  const filteredTasks = tasks.filter(task => {
-    const today = new Date();
-    const taskDate = new Date(task.dueDate);
-    
-    switch (filter) {
-      case 'pending':
-        return !task.completed;
-      case 'completed':
-        return task.completed;
-      case 'overdue':
-        return !task.completed && taskDate < today;
-      default:
-        return true;
-    }
-  });
+  const deleteTask = (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    setTasks(tasks.filter(t => t.id !== taskId));
+    toast.success(`Task "${task?.title}" deleted`);
+  };
+
+  const connectToTimeline = (taskId: string) => {
+    setTasks(tasks.map(task => 
+      task.id === taskId ? { ...task, connectedToTimeline: !task.connectedToTimeline } : task
+    ));
+    const task = tasks.find(t => t.id === taskId);
+    toast.success(`Task ${task?.connectedToTimeline ? 'disconnected from' : 'connected to'} timeline`);
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default:
-        return 'bg-green-100 text-green-800 border-green-200';
+      case 'high': return 'bg-red-100 text-red-800 border-red-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'low': return 'bg-green-100 text-green-800 border-green-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
-  const getStatusIcon = (item: TimelineItem) => {
-    if (item.completed) {
-      return <Check className="w-5 h-5 text-green-500" />;
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
+      case 'high': return <AlertCircle className="w-4 h-4" />;
+      case 'medium': return <Clock className="w-4 h-4" />;
+      case 'low': return <CheckCircle2 className="w-4 h-4" />;
+      default: return <Clock className="w-4 h-4" />;
     }
-    
-    const today = new Date();
-    const itemDate = new Date(item.date);
-    
-    if (itemDate < today) {
-      return <AlertCircle className="w-5 h-5 text-red-500" />;
-    }
-    
-    return <Circle className="w-5 h-5 text-gray-400" />;
   };
 
-  const isOverdue = (dateString: string, completed: boolean) => {
-    return new Date(dateString) < new Date() && !completed;
-  };
+  const completedTasks = tasks.filter(t => t.completed).length;
+  const totalTasks = tasks.length;
+  const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-2 md:p-4">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center mb-8">
-          <Button 
-            onClick={onBack}
-            variant="ghost" 
-            className="mr-4 hover:bg-blue-100"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Dashboard
-          </Button>
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-              <CheckSquare className="w-6 h-6 text-white" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 gap-4">
+          <div className="flex items-center">
+            <Button onClick={onBack} variant="ghost" className="mr-2 md:mr-4 p-2">
+              <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Back</span>
+            </Button>
+            <div>
+              <h1 className="text-xl md:text-3xl font-bold text-gray-800 flex items-center">
+                <CheckSquare className="w-6 h-6 md:w-8 md:h-8 mr-2 md:mr-3 text-blue-600" />
+                Task Checklist
+              </h1>
+              <p className="text-sm md:text-base text-gray-600 mt-1">Manage your event planning tasks</p>
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Task Checklist & Timeline
-            </h1>
+          </div>
+          
+          <div className="flex gap-2 w-full sm:w-auto">
+            {onViewTimeline && (
+              <Button 
+                onClick={onViewTimeline}
+                variant="outline"
+                className="flex-1 sm:flex-none bg-white hover:bg-gray-50 text-sm"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                View Timeline
+              </Button>
+            )}
+            <Button 
+              onClick={() => setShowAddTask(true)}
+              className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-sm"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Task
+            </Button>
           </div>
         </div>
 
-        {/* Tabs for Task List and Timeline View */}
-        <Tabs defaultValue="tasks" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="tasks" className="flex items-center space-x-2">
-              <CheckSquare className="w-4 h-4" />
-              <span>Task Checklist</span>
-            </TabsTrigger>
-            <TabsTrigger value="timeline" className="flex items-center space-x-2">
-              <Clock className="w-4 h-4" />
-              <span>Timeline View</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Task Checklist Tab */}
-          <TabsContent value="tasks">
-            {/* Controls */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { key: 'all', label: 'All Tasks' },
-                  { key: 'pending', label: 'Pending' },
-                  { key: 'completed', label: 'Completed' },
-                  { key: 'overdue', label: 'Overdue' }
-                ].map(({ key, label }) => (
-                  <Button
-                    key={key}
-                    variant={filter === key ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setFilter(key as typeof filter)}
-                    className={filter === key ? 'bg-blue-500 hover:bg-blue-600' : 'hover:bg-blue-50'}
-                  >
-                    {label}
-                  </Button>
-                ))}
-              </div>
-
-              <Dialog open={isAddTaskOpen} onOpenChange={setIsAddTaskOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Task
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add New Task</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Task Title</Label>
-                      <Input
-                        value={newTask.title}
-                        onChange={(e) => setNewTask({...newTask, title: e.target.value})}
-                        placeholder="Enter task title"
-                      />
-                    </div>
-                    <div>
-                      <Label>Description</Label>
-                      <Textarea
-                        value={newTask.description}
-                        onChange={(e) => setNewTask({...newTask, description: e.target.value})}
-                        placeholder="Enter task description"
-                        rows={3}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label>Priority</Label>
-                        <Select value={newTask.priority} onValueChange={(value: 'low' | 'medium' | 'high') => setNewTask({...newTask, priority: value})}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="low">Low</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="high">High</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label>Due Date</Label>
-                        <Input
-                          type="date"
-                          value={newTask.dueDate}
-                          onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label>Category</Label>
-                      <Input
-                        value={newTask.category}
-                        onChange={(e) => setNewTask({...newTask, category: e.target.value})}
-                        placeholder="e.g., Catering, Venue, Decorations"
-                      />
-                    </div>
-                    <Button onClick={handleAddTask} className="w-full">
-                      Add Task
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+        {/* Progress Overview */}
+        <Card className="mb-4 md:mb-6 shadow-lg bg-white/90 backdrop-blur-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base md:text-lg">Progress Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm text-gray-600">Tasks Completed</span>
+              <span className="font-semibold">{completedTasks} of {totalTasks}</span>
             </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div 
+                className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-2">{Math.round(progressPercentage)}% Complete</p>
+          </CardContent>
+        </Card>
 
-            {/* Task List */}
-            <div className="space-y-4">
-              {filteredTasks.map((task) => (
-                <Card 
+        {/* Add Task Form */}
+        {showAddTask && (
+          <Card className="mb-4 md:mb-6 shadow-lg bg-white/90 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base md:text-lg">Add New Task</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="taskTitle" className="text-sm">Task Title *</Label>
+                <Input
+                  id="taskTitle"
+                  placeholder="Enter task title"
+                  value={newTask.title}
+                  onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="taskDescription" className="text-sm">Description</Label>
+                <Input
+                  id="taskDescription"
+                  placeholder="Enter task description"
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+                  className="text-sm"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="taskDueDate" className="text-sm">Due Date</Label>
+                  <Input
+                    id="taskDueDate"
+                    type="date"
+                    value={newTask.dueDate}
+                    onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="taskPriority" className="text-sm">Priority</Label>
+                  <Select 
+                    value={newTask.priority} 
+                    onValueChange={(value: 'low' | 'medium' | 'high') => 
+                      setNewTask({...newTask, priority: value})
+                    }
+                  >
+                    <SelectTrigger className="text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleAddTask} className="flex-1 bg-blue-600 hover:bg-blue-700 text-sm">
+                  Add Task
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowAddTask(false)}
+                  className="text-sm"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Tasks List */}
+        <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base md:text-lg">Your Tasks</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {tasks.map((task) => (
+                <div 
                   key={task.id} 
-                  className={`shadow-lg transition-all duration-300 ${
+                  className={`p-3 md:p-4 rounded-lg border-2 transition-all duration-200 ${
                     task.completed 
-                      ? 'bg-green-50 border-green-200' 
-                      : isOverdue(task.dueDate, task.completed)
-                        ? 'bg-red-50 border-red-200'
-                        : 'bg-white hover:shadow-xl'
+                      ? 'bg-green-50 border-green-200 opacity-75' 
+                      : 'bg-white border-gray-200 hover:border-blue-300'
                   }`}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleToggleTask(task.id)}
-                        className={`mt-1 p-1 rounded-full ${
+                  <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+                    <div className="flex items-start space-x-3 flex-1">
+                      <button
+                        onClick={() => toggleTaskComplete(task.id)}
+                        className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                           task.completed 
-                            ? 'text-green-600 hover:bg-green-100' 
-                            : 'text-gray-400 hover:bg-gray-100'
+                            ? 'bg-green-500 border-green-500 text-white' 
+                            : 'border-gray-300 hover:border-blue-500'
                         }`}
                       >
-                        {task.completed ? <Check className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
-                      </Button>
+                        {task.completed && <CheckCircle2 className="w-3 h-3" />}
+                      </button>
                       
-                      <div className="flex-grow">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className={`font-semibold text-lg ${
-                            task.completed ? 'line-through text-gray-500' : 'text-gray-800'
+                      <div className="flex-1 min-w-0">
+                        <h3 className={`font-semibold text-sm md:text-base ${
+                          task.completed ? 'line-through text-gray-500' : 'text-gray-800'
+                        }`}>
+                          {task.title}
+                        </h3>
+                        {task.description && (
+                          <p className={`text-xs md:text-sm mt-1 ${
+                            task.completed ? 'text-gray-400' : 'text-gray-600'
                           }`}>
-                            {task.title}
-                          </h3>
-                          <div className="flex items-center space-x-2">
-                            <Badge className={getPriorityColor(task.priority)}>
-                              {task.priority}
-                            </Badge>
-                            {isOverdue(task.dueDate, task.completed) && (
-                              <Badge className="bg-red-100 text-red-800">
-                                Overdue
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <p className="text-gray-600 mb-3">{task.description}</p>
-                        
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center text-gray-500">
-                            <Calendar className="w-4 h-4 mr-2" />
-                            <span>{new Date(task.dueDate).toLocaleDateString()}</span>
-                          </div>
-                          {task.category && (
-                            <Badge variant="outline">{task.category}</Badge>
+                            {task.description}
+                          </p>
+                        )}
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs border ${getPriorityColor(task.priority)}`}>
+                            {getPriorityIcon(task.priority)}
+                            <span className="ml-1 capitalize">{task.priority}</span>
+                          </span>
+                          {task.dueDate && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700 border border-gray-200">
+                              <Calendar className="w-3 h-3 mr-1" />
+                              {new Date(task.dueDate).toLocaleDateString()}
+                            </span>
+                          )}
+                          {task.connectedToTimeline && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700 border border-blue-200">
+                              <Link className="w-3 h-3 mr-1" />
+                              Timeline
+                            </span>
                           )}
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                    
+                    <div className="flex gap-2 justify-end lg:justify-start">
+                      <Button
+                        size="sm"
+                        variant={task.connectedToTimeline ? "default" : "outline"}
+                        onClick={() => connectToTimeline(task.id)}
+                        className="p-2"
+                        title={task.connectedToTimeline ? "Disconnect from timeline" : "Connect to timeline"}
+                      >
+                        <Link className="w-3 h-3 md:w-4 md:h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => deleteTask(task.id)}
+                        className="p-2"
+                      >
+                        <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
-          </TabsContent>
-
-          {/* Timeline Tab */}
-          <TabsContent value="timeline">
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Task Timeline</h3>
-              {timelineItems.length === 0 ? (
-                <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
-                  <CardContent className="p-12 text-center">
-                    <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-700 mb-2">No timeline items</h3>
-                    <p className="text-gray-600">Add some tasks to see your timeline!</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                timelineItems
-                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                  .map((item) => (
-                    <Card key={item.id} className="shadow-lg bg-white/90 backdrop-blur-sm">
-                      <CardContent className="p-6">
-                        <div className="flex items-start space-x-4">
-                          <div className="flex-shrink-0 mt-1">
-                            {getStatusIcon(item)}
-                          </div>
-                          
-                          <div className="flex-grow">
-                            <div className="flex items-center justify-between mb-2">
-                              <h3 className={`font-semibold text-lg ${
-                                item.completed ? 'line-through text-gray-500' : 'text-gray-800'
-                              }`}>
-                                {item.title}
-                              </h3>
-                              <div className="flex items-center space-x-2">
-                                <Badge className={getPriorityColor(item.priority)}>
-                                  {item.priority}
-                                </Badge>
-                                {isOverdue(item.date, item.completed) && (
-                                  <Badge className="bg-red-100 text-red-800">
-                                    Overdue
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                            
-                            <p className="text-gray-600 mb-3">{item.description}</p>
-                            
-                            <div className="flex items-center text-sm text-gray-500">
-                              <Calendar className="w-4 h-4 mr-2" />
-                              <span>{new Date(item.date).toLocaleDateString('en-US', {
-                                weekday: 'short',
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric'
-                              })}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

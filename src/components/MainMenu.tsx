@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -63,7 +62,7 @@ export const MainMenu = ({
     {
       id: 'enhanced-invite-guests',
       title: 'Invite Guests',
-      description: 'Build your guest list and send invitations',
+      description: 'Build guest list, send invitations & import contacts',
       icon: Users,
       color: 'from-yellow-500 to-lime-600'
     },
@@ -83,15 +82,15 @@ export const MainMenu = ({
     },
     {
       id: 'enhanced-shared-access',
-      title: 'Shared Access',
-      description: 'Invite co-hosts and manage collaborators',
+      title: 'Shared Access & Collaborators',
+      description: 'Invite co-hosts, manage collaborators & permissions',
       icon: UserPlus,
       color: 'from-yellow-500 to-green-600'
     },
     {
       id: 'enhanced-whatsapp-integration',
       title: 'WhatsApp Integration',
-      description: 'Share updates via WhatsApp',
+      description: 'Share updates & communicate via WhatsApp',
       icon: MessageSquare,
       color: 'from-green-500 to-lime-600'
     },
@@ -121,15 +120,15 @@ export const MainMenu = ({
     },
     {
       id: 'timeline',
-      title: 'Timeline',
-      description: 'Event planning timeline',
+      title: 'Timeline & Planning',
+      description: 'Event planning timeline & milestones',
       icon: Clock,
       color: 'from-yellow-400 to-lime-400'
     },
     {
-      id: 'timeline', // Link checklist to timeline
+      id: 'task-checklist',
       title: 'Task Checklist',
-      description: 'Track tasks and deadlines (linked to timeline)',
+      description: 'Track tasks and deadlines (connected to timeline)',
       icon: CheckSquare,
       color: 'from-blue-400 to-green-400'
     },
