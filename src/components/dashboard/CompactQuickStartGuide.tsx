@@ -144,7 +144,7 @@ export const CompactQuickStartGuide = ({
                     size="sm"
                     className={`bg-gradient-to-r ${steps[currentStep].color} hover:opacity-90 text-white h-6 w-6 md:h-8 md:w-8 p-0`}
                   >
-                    <span className="text-xs md:text-sm">→</span>
+                    <span className="text-xs md:text-sm">&rarr;</span>
                   </Button>
                 </div>
               </div>
