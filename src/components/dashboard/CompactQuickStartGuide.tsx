@@ -144,7 +144,7 @@ export const CompactQuickStartGuide = ({
               </p>
               {completedSteps.length === steps.length && (
                 <p className="text-xs text-green-600 font-medium">
-                  🎉 All set! You're ready to plan!
+                  🎉 All set! You&apos;re ready to plan!
                 </p>
               )}
             </div>
