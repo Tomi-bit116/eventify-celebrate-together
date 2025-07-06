@@ -46,6 +46,8 @@ export const CompactQuickStartGuide = ({ onClose }: CompactQuickStartGuideProps)
     }
   };
 
+  const StepIcon = steps[currentStep].icon;
+
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-white shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
@@ -79,13 +81,13 @@ export const CompactQuickStartGuide = ({ onClose }: CompactQuickStartGuideProps)
 
             <div className="text-center">
               <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br ${steps[currentStep].color} flex items-center justify-center`}>
-                <steps[currentStep].icon className="w-8 h-8 text-white" />
+                <StepIcon className="w-8 h-8 text-white" />
               </div>
-              
+
               <h4 className="text-lg font-semibold text-gray-800 mb-2">
                 {steps[currentStep].title}
               </h4>
-              
+
               <p className="text-gray-600 text-sm leading-relaxed">
                 {steps[currentStep].description}
               </p>
@@ -100,11 +102,11 @@ export const CompactQuickStartGuide = ({ onClose }: CompactQuickStartGuideProps)
               >
                 Previous
               </Button>
-              
+
               <div className="text-xs text-gray-500 self-center">
                 {currentStep + 1} of {steps.length}
               </div>
-              
+
               <Button
                 onClick={nextStep}
                 className="px-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
