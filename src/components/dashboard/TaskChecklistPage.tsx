@@ -57,7 +57,7 @@ export const TaskChecklistPage = ({ onBack }: TaskChecklistPageProps) => {
     title: '',
     description: '',
     dueDate: '',
-    priority: 'medium' as const,
+    priority: 'medium' as 'low' | 'medium' | 'high',
     category: ''
   });
 
