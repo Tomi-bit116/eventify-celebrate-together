@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +9,6 @@ import { MainMenu } from './MainMenu';
 import { CompactQuickStartGuide } from './dashboard/CompactQuickStartGuide';
 import { InviteGuestsPage } from './dashboard/InviteGuestsPage';
 import { TrackRSVPsPage } from './dashboard/TrackRSVPsPage';
-import { BudgetTrackerPage } from './dashboard/BudgetTrackerPage';
 import { TaskChecklistPage } from './dashboard/TaskChecklistPage';
 import { TimelinePage } from './dashboard/TimelinePage';
 import { SettingsPage } from './dashboard/SettingsPage';
@@ -90,8 +90,6 @@ export const Dashboard = ({ userId }: DashboardProps) => {
         return <InviteGuestsPage onBack={() => setActiveFeature(null)} />;
       case 'track-rsvps':
         return <TrackRSVPsPage onBack={() => setActiveFeature(null)} />;
-      case 'manage-budget':
-        return <BudgetTrackerPage onBack={() => setActiveFeature(null)} />;
       case 'task-checklist':
         return <TaskChecklistPage onBack={() => setActiveFeature(null)} />;
       case 'timeline':
@@ -105,7 +103,7 @@ export const Dashboard = ({ userId }: DashboardProps) => {
       case 'event-templates':
         return <EventTemplatesPage onBack={() => setActiveFeature(null)} />;
       case 'vendor-contact-book':
-        return <VendorContactBookPage onBack={() => setActiveFeature(null)} />;
+        return <VendorContactBookPage onBack={() => setActiveFeature(null)} onWhatsAppMessage={() => {}} />;
       
       case 'interactive-invite-guests':
         return <InteractiveInviteGuestsPage onBack={() => setActiveFeature(null)} currentEvent={selectedEvent} />;

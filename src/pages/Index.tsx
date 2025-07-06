@@ -57,7 +57,7 @@ const Index = () => {
   }
 
   if (user && showDashboard) {
-    return <Dashboard />;
+    return <Dashboard userId={user.id} />;
   }
 
   if (user && showOnboarding) {

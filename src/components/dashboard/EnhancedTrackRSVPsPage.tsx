@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,7 +49,14 @@ export const EnhancedTrackRSVPsPage = ({ onBack, currentEvent }: EnhancedTrackRS
         .order('created_at', { ascending: false });
 
       if (rsvpError) throw rsvpError;
-      setRsvps(rsvpData || []);
+      
+      // Type cast the rsvp_status to ensure it matches our expected type
+      const typedRsvps = rsvpData?.map(rsvp => ({
+        ...rsvp,
+        rsvp_status: rsvp.rsvp_status as 'yes' | 'no' | 'maybe'
+      })) || [];
+      
+      setRsvps(typedRsvps);
 
       // Fetch stats
       const { data: statsData, error: statsError } = await supabase
