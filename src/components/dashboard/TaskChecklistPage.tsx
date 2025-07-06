@@ -2,24 +2,15 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, CheckSquare, Plus, Trash2, Clock, Calendar, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CheckSquare, Plus, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+import { Task, NewTask } from './task-checklist/types';
+import { ProgressOverview } from './task-checklist/ProgressOverview';
+import { AddTaskForm } from './task-checklist/AddTaskForm';
+import { TaskList } from './task-checklist/TaskList';
 
 interface TaskChecklistPageProps {
   onBack: () => void;
-}
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  dueDate: string;
-  priority: 'low' | 'medium' | 'high';
-  completed: boolean;
-  category: string;
 }
 
 export const TaskChecklistPage = ({ onBack }: TaskChecklistPageProps) => {
@@ -53,40 +44,25 @@ export const TaskChecklistPage = ({ onBack }: TaskChecklistPageProps) => {
     }
   ]);
 
-  const [newTask, setNewTask] = useState({
-    title: '',
-    description: '',
-    dueDate: '',
-    priority: 'medium' as 'low' | 'medium' | 'high',
-    category: ''
-  });
-
   const [showAddTask, setShowAddTask] = useState(false);
 
-  const handleAddTask = () => {
-    if (!newTask.title || !newTask.dueDate) {
+  const handleAddTask = (newTaskData: NewTask) => {
+    if (!newTaskData.title || !newTaskData.dueDate) {
       toast.error("Please fill in title and due date");
       return;
     }
 
     const task: Task = {
       id: Date.now().toString(),
-      title: newTask.title,
-      description: newTask.description,
-      dueDate: newTask.dueDate,
-      priority: newTask.priority,
+      title: newTaskData.title,
+      description: newTaskData.description,
+      dueDate: newTaskData.dueDate,
+      priority: newTaskData.priority,
       completed: false,
-      category: newTask.category || 'General'
+      category: newTaskData.category || 'General'
     };
 
     setTasks([...tasks, task]);
-    setNewTask({
-      title: '',
-      description: '',
-      dueDate: '',
-      priority: 'medium',
-      category: ''
-    });
     setShowAddTask(false);
     toast.success("Task added successfully!");
   };
@@ -103,22 +79,8 @@ export const TaskChecklistPage = ({ onBack }: TaskChecklistPageProps) => {
     toast.success("Task deleted!");
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low':
-        return 'bg-green-100 text-green-800 border-green-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
   const completedTasks = tasks.filter(task => task.completed).length;
   const totalTasks = tasks.length;
-  const completionPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
@@ -139,26 +101,7 @@ export const TaskChecklistPage = ({ onBack }: TaskChecklistPageProps) => {
         </div>
 
         {/* Progress Overview */}
-        <Card className="mb-6 shadow-lg bg-white/90 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Progress Overview</span>
-              <span className="text-sm text-gray-600">{completedTasks}/{totalTasks} tasks completed</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
-              <div 
-                className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-300"
-                style={{ width: `${completionPercentage}%` }}
-              />
-            </div>
-            <div className="text-center">
-              <span className="text-2xl font-bold text-blue-600">{Math.round(completionPercentage)}%</span>
-              <span className="text-gray-600 ml-2">Complete</span>
-            </div>
-          </CardContent>
-        </Card>
+        <ProgressOverview completedTasks={completedTasks} totalTasks={totalTasks} />
 
         {/* Add Task Section */}
         <Card className="mb-6 shadow-lg bg-white/90 backdrop-blur-sm">
@@ -173,127 +116,18 @@ export const TaskChecklistPage = ({ onBack }: TaskChecklistPageProps) => {
           </CardHeader>
           <CardContent>
             {showAddTask && (
-              <div className="bg-blue-50 p-4 rounded-lg mb-4 space-y-4">
-                <div>
-                  <Label htmlFor="taskTitle">Task Title *</Label>
-                  <Input
-                    id="taskTitle"
-                    placeholder="Enter task title"
-                    value={newTask.title}
-                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="taskDescription">Description</Label>
-                  <Input
-                    id="taskDescription"
-                    placeholder="Task description (optional)"
-                    value={newTask.description}
-                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="taskDueDate">Due Date *</Label>
-                    <Input
-                      id="taskDueDate"
-                      type="date"
-                      value={newTask.dueDate}
-                      onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="taskPriority">Priority</Label>
-                    <Select value={newTask.priority} onValueChange={(value: 'low' | 'medium' | 'high') => setNewTask({ ...newTask, priority: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="taskCategory">Category</Label>
-                    <Input
-                      id="taskCategory"
-                      placeholder="e.g., Venue, Catering"
-                      value={newTask.category}
-                      onChange={(e) => setNewTask({ ...newTask, category: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={handleAddTask} className="bg-blue-600 hover:bg-blue-700">
-                    Add Task
-                  </Button>
-                  <Button variant="outline" onClick={() => setShowAddTask(false)}>
-                    Cancel
-                  </Button>
-                </div>
-              </div>
+              <AddTaskForm
+                onAddTask={handleAddTask}
+                onCancel={() => setShowAddTask(false)}
+              />
             )}
 
             {/* Tasks List */}
-            <div className="space-y-4">
-              {tasks.map((task) => (
-                <div key={task.id} className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                  task.completed 
-                    ? 'bg-green-50 border-green-200 opacity-75' 
-                    : 'bg-white border-gray-200 hover:border-blue-300'
-                }`}>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-3 flex-1">
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => toggleTaskCompletion(task.id)}
-                        className="mt-1 w-5 h-5 text-blue-600"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-semibold ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
-                          {task.title}
-                        </h3>
-                        {task.description && (
-                          <p className={`text-sm mt-1 ${task.completed ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {task.description}
-                          </p>
-                        )}
-                        <div className="flex items-center space-x-4 mt-2">
-                          <div className="flex items-center text-sm text-gray-500">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            {new Date(task.dueDate).toLocaleDateString()}
-                          </div>
-                          <span className={`px-2 py-1 rounded text-xs font-medium border ${getPriorityColor(task.priority)}`}>
-                            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                          </span>
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
-                            {task.category}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteTask(task.id)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {tasks.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                <CheckSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No tasks yet. Add your first task to get started!</p>
-              </div>
-            )}
+            <TaskList
+              tasks={tasks}
+              onToggleCompletion={toggleTaskCompletion}
+              onDelete={deleteTask}
+            />
           </CardContent>
         </Card>
 
