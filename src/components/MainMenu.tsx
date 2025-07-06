@@ -61,11 +61,11 @@ export const MainMenu = ({
       color: 'from-lime-500 to-green-600'
     },
     {
-      id: 'enhanced-invite-guests',
-      title: 'Invite Guests',
-      description: 'Build guest list, send invitations & import contacts',
+      id: 'interactive-invite-guests',
+      title: 'Interactive Guest Invitations',
+      description: 'Generate links, share invites & track RSVPs in real-time',
       icon: Users,
-      color: 'from-yellow-500 to-lime-600'
+      color: 'from-coral-500 to-coral-600'
     },
     {
       id: 'manage-budget',
@@ -75,11 +75,11 @@ export const MainMenu = ({
       color: 'from-green-500 to-emerald-600'
     },
     {
-      id: 'track-rsvps',
+      id: 'enhanced-track-rsvps',
       title: 'Track RSVPs',
-      description: 'Monitor guest responses',
+      description: 'Monitor guest responses in real-time',
       icon: UserCheck,
-      color: 'from-lime-500 to-yellow-600'
+      color: 'from-blue-500 to-indigo-600'
     },
     {
       id: 'enhanced-shared-access',

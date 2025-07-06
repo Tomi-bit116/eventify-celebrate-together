@@ -145,6 +145,44 @@ export type Database = {
           },
         ]
       }
+      invitations: {
+        Row: {
+          created_at: string
+          event_id: string
+          expires_at: string | null
+          id: string
+          invitation_code: string
+          is_active: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          expires_at?: string | null
+          id?: string
+          invitation_code: string
+          is_active?: boolean | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          expires_at?: string | null
+          id?: string
+          invitation_code?: string
+          is_active?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -171,6 +209,57 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      rsvps: {
+        Row: {
+          created_at: string
+          event_id: string
+          guest_email: string | null
+          guest_name: string
+          guest_phone: string | null
+          id: string
+          invitation_id: string
+          responded_at: string
+          rsvp_status: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          guest_email?: string | null
+          guest_name: string
+          guest_phone?: string | null
+          id?: string
+          invitation_id: string
+          responded_at?: string
+          rsvp_status: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          guest_email?: string | null
+          guest_name?: string
+          guest_phone?: string | null
+          id?: string
+          invitation_id?: string
+          responded_at?: string
+          rsvp_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rsvps_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rsvps_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "invitations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tasks: {
         Row: {
@@ -319,6 +408,10 @@ export type Database = {
         Args: { event_id_param: string; user_id_param: string }
         Returns: boolean
       }
+      generate_invitation_link: {
+        Args: { event_id_param: string; user_id_param: string }
+        Returns: string
+      }
       get_event_tasks: {
         Args: { event_id_param: string; user_id_param: string }
         Returns: {
@@ -329,6 +422,15 @@ export type Database = {
           completed: boolean
           priority: string
           created_at: string
+        }[]
+      }
+      get_rsvp_stats: {
+        Args: { event_id_param: string; user_id_param: string }
+        Returns: {
+          total_rsvps: number
+          yes_count: number
+          no_count: number
+          maybe_count: number
         }[]
       }
       get_user_events: {
