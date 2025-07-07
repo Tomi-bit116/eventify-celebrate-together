@@ -17,7 +17,14 @@ const Index = () => {
 
   useEffect(() => {
     if (!loading && user) {
-      setShowDashboard(true);
+      // Check if user is new by looking at metadata
+      const isNewUser = user.user_metadata?.is_new_user === true;
+      
+      if (isNewUser) {
+        setShowOnboarding(true);
+      } else {
+        setShowDashboard(true);
+      }
     }
   }, [user, loading]);
 

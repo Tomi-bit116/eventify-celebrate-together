@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { RSVPForm } from '@/components/RSVPForm';
 import Index from '@/pages/Index';
+import Auth from '@/pages/Auth';
 import { Toaster } from 'sonner';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <div className="min-h-screen bg-gradient-to-br from-coral-50 to-teal-50">
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/rsvp/:invitationCode" element={<RSVPForm />} />
           </Routes>
           <Toaster />
