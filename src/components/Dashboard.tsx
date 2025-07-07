@@ -17,9 +17,12 @@ import { WhatsAppIntegrationPage } from './dashboard/WhatsAppIntegrationPage';
 import { VendorContactBookPage } from './dashboard/VendorContactBookPage';
 import { InteractiveInviteGuestsPage } from './dashboard/InteractiveInviteGuestsPage';
 import { EnhancedTrackRSVPsPage } from './dashboard/EnhancedTrackRSVPsPage';
+import { MyEventsPage } from './dashboard/MyEventsPage';
+import { CreateEventModal } from './dashboard/CreateEventModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DashboardProps {
   userId: string;
@@ -34,58 +37,94 @@ export const Dashboard = ({ userId }: DashboardProps) => {
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const [showQuickStartGuide, setShowQuickStartGuide] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is new and should see quick start guide
     if (user?.user_metadata?.is_new_user === true) {
       setShowQuickStartGuide(true);
     }
-
-    // Mock events for now
-    const mockEvents = [
-      {
-        id: '1',
-        name: 'Adunni & Chidi Wedding',
-        date: '2024-08-10',
-        venue: 'The Balmoral Hall',
-        description: 'A celebration of love',
-        budget: 10000,
-        tasks: 25,
-        guests: 200,
-        image: 'https://images.unsplash.com/photo-1556912172-8396ca5c8418?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHdlZGRpbmd8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'
-      },
-      {
-        id: '2',
-        name: 'Emeka 40th Birthday Bash',
-        date: '2024-09-15',
-        venue: 'Eko Hotel & Suites',
-        description: 'Celebrating 40 years of greatness',
-        budget: 5000,
-        tasks: 15,
-        guests: 100,
-        image: 'https://images.unsplash.com/photo-1508768787810-6adc1743f03d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHBhcnR5fGVufDB8fDB8fHww&auto=format&fit=crop&w=600&q=60'
-      },
-    ];
-    setEvents(mockEvents);
+    
+    if (user) {
+      fetchEvents();
+    }
   }, [user]);
+
+  const fetchEvents = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase.rpc('get_user_events', {
+        user_id_param: user.id
+      });
+
+      if (error) {
+        console.error('Error fetching events:', error);
+        toast.error('Failed to load events');
+        return;
+      }
+
+      setEvents(data || []);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      toast.error('Failed to load events');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEventSelect = (event: any) => {
     setSelectedEvent(event);
     setActiveFeature(null);
   };
 
-  const handleCreateEvent = (newEvent: any) => {
-    setEvents([...events, { ...newEvent, id: Date.now().toString() }]);
+  const handleCreateEvent = () => {
+    setIsEventFormOpen(true);
+  };
+
+  const handleEventCreated = (newEvent: any) => {
+    setEvents([newEvent, ...events]);
     setIsEventFormOpen(false);
     toast.success('Event created successfully! 🎉');
   };
 
-  const handleEditEvent = () => {
+  const handleEditEvent = (event: any) => {
+    setSelectedEvent(event);
     setIsEventFormOpen(true);
   };
 
-  const handleShareEvent = () => {
-    toast.success('Event shared successfully! 📤');
+  const handleShareEvent = (event: any) => {
+    // Copy event details to clipboard
+    const eventDetails = `🎉 You're invited to ${event.name}!\n\n📅 Date: ${new Date(event.event_date).toLocaleDateString()}\n📍 Venue: ${event.venue || 'TBA'}\n\nRSVP now!`;
+    navigator.clipboard.writeText(eventDetails);
+    toast.success('Event details copied to clipboard! 📋');
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase.rpc('delete_user_event', {
+        event_id_param: eventId,
+        user_id_param: user.id
+      });
+
+      if (error) {
+        console.error('Error deleting event:', error);
+        toast.error('Failed to delete event');
+        return;
+      }
+
+      if (data) {
+        setEvents(events.filter(event => event.id !== eventId));
+        toast.success('Event deleted successfully');
+      } else {
+        toast.error('Event not found or you do not have permission to delete it');
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast.error('Failed to delete event');
+    }
   };
 
   const handleSignOut = async () => {
@@ -103,13 +142,13 @@ export const Dashboard = ({ userId }: DashboardProps) => {
   };
 
   const getUserDisplayName = () => {
-    return user?.user_metadata?.display_name || user?.user_metadata?.full_name || 'there';
+    return user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
   };
 
   const renderFeature = () => {
     switch (activeFeature) {
-      case 'create-event':
-        return <EventForm onCreate={handleCreateEvent} onCancel={() => setActiveFeature(null)} />;
+      case 'my-events':
+        return <MyEventsPage onBack={() => setActiveFeature(null)} onEventSelect={handleEventSelect} onCreateEvent={handleCreateEvent} />;
       case 'invite-guests':
         return <InviteGuestsPage onBack={() => setActiveFeature(null)} />;
       case 'track-rsvps':
@@ -155,14 +194,14 @@ export const Dashboard = ({ userId }: DashboardProps) => {
               <Card className="bg-gradient-to-r from-teal-500 to-teal-600 text-white">
                 <CardContent className="p-4 text-center">
                   <Users className="w-8 h-8 mx-auto mb-2" />
-                  <h3 className="text-2xl font-bold">{events.reduce((acc, event) => acc + event.guests, 0)}</h3>
+                  <h3 className="text-2xl font-bold">{events.reduce((acc, event) => acc + (event.expected_guests || 0), 0)}</h3>
                   <p className="text-sm opacity-90">Guests Invited</p>
                 </CardContent>
               </Card>
               <Card className="bg-gradient-to-r from-amber-500 to-amber-600 text-white">
                 <CardContent className="p-4 text-center">
                   <CheckSquare className="w-8 h-8 mx-auto mb-2" />
-                  <h3 className="text-2xl font-bold">{events.reduce((acc, event) => acc + event.tasks, 0)}</h3>
+                  <h3 className="text-2xl font-bold">0</h3>
                   <p className="text-sm opacity-90">Tasks Remaining</p>
                 </CardContent>
               </Card>
@@ -180,7 +219,7 @@ export const Dashboard = ({ userId }: DashboardProps) => {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <Button
-                onClick={() => setIsEventFormOpen(true)}
+                onClick={handleCreateEvent}
                 className="h-20 bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white flex flex-col items-center justify-center space-y-2"
               >
                 <Plus className="w-6 h-6" />
@@ -211,26 +250,97 @@ export const Dashboard = ({ userId }: DashboardProps) => {
 
             {/* Upcoming Events */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Upcoming Events</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {events.map((event) => (
-                  <EventCard
-                    key={event.id}
-                    event={event}
-                    onSelect={handleEventSelect}
-                  />
-                ))}
-                <Card
-                  className="cursor-pointer bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:shadow-lg transition-all duration-200 flex items-center justify-center min-h-[200px]"
-                  onClick={() => setIsEventFormOpen(true)}
-                >
-                  <CardContent className="text-center">
-                    <Plus className="w-12 h-12 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold">Create New Event</h3>
-                    <p className="text-sm opacity-80">Start planning your celebration</p>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Your Upcoming Events</h2>
+                <Button onClick={() => setActiveFeature('my-events')} variant="outline">
+                  View All Events
+                </Button>
+              </div>
+              
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin w-8 h-8 border-4 border-coral-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading your events...</p>
+                </div>
+              ) : events.length === 0 ? (
+                <Card className="text-center py-12">
+                  <CardContent>
+                    <CalendarIcon className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-xl font-semibold text-gray-700 mb-2">No events yet</h3>
+                    <p className="text-gray-500 mb-4">Create your first event to get started!</p>
+                    <Button onClick={handleCreateEvent} className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Your First Event
+                    </Button>
                   </CardContent>
                 </Card>
-              </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {events.slice(0, 6).map((event) => (
+                    <Card key={event.id} className="hover:shadow-lg transition-shadow duration-200">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg font-bold text-gray-800 truncate">{event.name}</CardTitle>
+                          <div className="flex space-x-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleShareEvent(event)}
+                              className="hover:bg-green-100 text-green-600"
+                              title="Share Event"
+                            >
+                              <Share2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditEvent(event)}
+                              className="hover:bg-blue-100 text-blue-600"
+                              title="Edit Event"
+                            >
+                              <Settings className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <p className="text-gray-600 text-sm line-clamp-2">{event.description}</p>
+                        
+                        <div className="flex items-center text-sm text-gray-600">
+                          <CalendarIcon className="w-4 h-4 mr-2 text-blue-500" />
+                          <span>{new Date(event.event_date).toLocaleDateString()}</span>
+                          {event.event_time && <span className="ml-2">at {event.event_time}</span>}
+                        </div>
+                        
+                        {event.venue && (
+                          <div className="flex items-center text-sm text-gray-600">
+                            <span className="w-4 h-4 mr-2 text-green-500">📍</span>
+                            <span className="truncate">{event.venue}</span>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Users className="w-4 h-4 mr-2 text-purple-500" />
+                          <span>{event.expected_guests || 0} expected guests</span>
+                        </div>
+                        
+                        <div className="flex justify-between items-center pt-2">
+                          <span className="text-sm font-medium text-gray-700">
+                            Budget: ${event.budget?.toLocaleString() || '0'}
+                          </span>
+                          <Button
+                            onClick={() => handleEventSelect(event)}
+                            size="sm"
+                            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                          >
+                            Manage
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -250,16 +360,16 @@ export const Dashboard = ({ userId }: DashboardProps) => {
         isOpen={isMainMenuOpen}
         onToggle={toggleMainMenu}
         currentEvent={selectedEvent}
-        onEditEvent={handleEditEvent}
-        onShareEvent={handleShareEvent}
+        onEditEvent={() => handleEditEvent(selectedEvent)}
+        onShareEvent={() => handleShareEvent(selectedEvent)}
       />
 
-      {/* Event Form Modal */}
+      {/* Create Event Modal */}
       {isEventFormOpen && (
-        <EventForm
+        <CreateEventModal
           isOpen={isEventFormOpen}
           onClose={() => setIsEventFormOpen(false)}
-          onCreate={handleCreateEvent}
+          onEventCreated={handleEventCreated}
         />
       )}
 
@@ -278,11 +388,11 @@ export const Dashboard = ({ userId }: DashboardProps) => {
           <div className="flex items-center space-x-2">
             {selectedEvent && (
               <>
-                <Button onClick={handleEditEvent}>
+                <Button onClick={() => handleEditEvent(selectedEvent)}>
                   <Settings className="w-4 h-4 mr-2" />
                   Edit Event
                 </Button>
-                <Button onClick={handleShareEvent} variant="outline">
+                <Button onClick={() => handleShareEvent(selectedEvent)} variant="outline">
                   <Share2 className="w-4 h-4 mr-2" />
                   Share
                 </Button>

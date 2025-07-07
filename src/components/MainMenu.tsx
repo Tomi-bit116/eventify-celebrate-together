@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface MainMenuProps {
   onFeatureClick: (feature: string) => void;
@@ -42,11 +43,13 @@ export const MainMenu = ({
   onShareEvent 
 }: MainMenuProps) => {
   const { signOut } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
       await signOut();
       toast.success("Signed out successfully");
+      navigate('/auth');
     } catch (error) {
       toast.error("Error signing out");
     }

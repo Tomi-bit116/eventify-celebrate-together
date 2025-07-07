@@ -5,10 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { CheckCircle, Calendar, MapPin, Clock, Users } from 'lucide-react';
+import { CheckCircle, Calendar, MapPin, Clock, Users, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 interface EventData {
   id: string;
@@ -22,6 +22,7 @@ interface EventData {
 
 export const RSVPForm = () => {
   const { invitationCode } = useParams();
+  const navigate = useNavigate();
   const [eventData, setEventData] = useState<EventData | null>(null);
   const [invitationId, setInvitationId] = useState<string>('');
   const [formData, setFormData] = useState({
@@ -126,10 +127,14 @@ export const RSVPForm = () => {
     }
   };
 
+  const goToHomepage = () => {
+    navigate('/');
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4 font-montserrat">
+        <Card className="w-full max-w-md shadow-2xl">
           <CardContent className="p-8 text-center">
             <div className="animate-spin w-8 h-8 border-4 border-coral-500 border-t-transparent rounded-full mx-auto mb-4"></div>
             <p className="text-gray-600">Loading event details...</p>
@@ -141,11 +146,19 @@ export const RSVPForm = () => {
 
   if (!eventData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4 font-montserrat">
+        <Card className="w-full max-w-md shadow-2xl">
           <CardContent className="p-8 text-center">
-            <p className="text-red-600 mb-4">Event not found or invitation expired</p>
-            <p className="text-gray-600 text-sm">Please check your invitation link and try again.</p>
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">❌</span>
+            </div>
+            <h2 className="text-xl font-bold text-red-600 mb-4">Invitation Not Found</h2>
+            <p className="text-gray-600 mb-4">This invitation link is invalid or has expired.</p>
+            <p className="text-gray-500 text-sm mb-6">Please check your invitation link and try again, or contact the event host.</p>
+            <Button onClick={goToHomepage} className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Go to Homepage
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -154,7 +167,7 @@ export const RSVPForm = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4 font-montserrat">
         <Card className="w-full max-w-md shadow-2xl">
           <CardContent className="p-8 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -164,9 +177,21 @@ export const RSVPForm = () => {
             <p className="text-gray-600 mb-4">
               Your RSVP for <strong>{eventData.name}</strong> has been received.
             </p>
-            <p className="text-sm text-gray-500">
-              We're excited to celebrate with you!
+            <div className="bg-gradient-to-r from-coral-50 to-teal-50 p-4 rounded-lg mb-4">
+              <p className="text-sm text-gray-700 mb-2">
+                <strong>Your Response:</strong> {formData.rsvpStatus === 'yes' ? '✅ Yes, I\'ll be there!' : formData.rsvpStatus === 'maybe' ? '🤔 Maybe' : '❌ Sorry, can\'t make it'}
+              </p>
+              <p className="text-sm text-gray-700">
+                We've sent a confirmation to the event host.
+              </p>
+            </div>
+            <p className="text-sm text-gray-500 mb-6">
+              We're excited to celebrate with you! 🎉
             </p>
+            <Button onClick={goToHomepage} className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Visit Eventify
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -174,7 +199,7 @@ export const RSVPForm = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4 font-montserrat">
       <Card className="w-full max-w-lg shadow-2xl">
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-2xl font-bold text-gray-800 mb-4">
@@ -214,6 +239,13 @@ export const RSVPForm = () => {
               <div className="flex items-center space-x-3 text-sm">
                 <MapPin className="w-4 h-4 text-emerald-600" />
                 <span className="text-gray-700">{eventData.venue}</span>
+              </div>
+            )}
+
+            {eventData.expected_guests && (
+              <div className="flex items-center space-x-3 text-sm">
+                <Users className="w-4 h-4 text-gold-600" />
+                <span className="text-gray-700">{eventData.expected_guests} expected guests</span>
               </div>
             )}
           </div>
@@ -306,6 +338,12 @@ export const RSVPForm = () => {
               {isSubmitting ? 'Submitting...' : 'Submit RSVP'}
             </Button>
           </form>
+
+          <div className="text-center">
+            <Button onClick={goToHomepage} variant="ghost" className="text-gray-500 hover:text-gray-700 text-sm">
+              Visit Eventify Homepage
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
