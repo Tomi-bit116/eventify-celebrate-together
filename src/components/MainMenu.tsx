@@ -55,20 +55,14 @@ export const MainMenu = ({
     }
   };
 
-  const menuItems = [
+  // Planning Tools - All moved here from dashboard
+  const planningTools = [
     {
-      id: 'create-event',
-      title: 'Create New Event',
-      description: 'Start planning your celebration',
-      icon: Plus,
-      color: 'from-lime-500 to-green-600'
-    },
-    {
-      id: 'interactive-invite-guests',
-      title: 'Interactive Guest Invitations',
-      description: 'Generate links, share invites & track RSVPs in real-time',
-      icon: Users,
-      color: 'from-coral-500 to-coral-600'
+      id: 'task-checklist',
+      title: 'Task Checklist',
+      description: 'Track tasks and deadlines',
+      icon: CheckSquare,
+      color: 'from-blue-500 to-indigo-600'
     },
     {
       id: 'manage-budget',
@@ -76,27 +70,6 @@ export const MainMenu = ({
       description: 'Monitor expenses and stay on track',
       icon: DollarSign,
       color: 'from-green-500 to-emerald-600'
-    },
-    {
-      id: 'enhanced-track-rsvps',
-      title: 'Track RSVPs',
-      description: 'Monitor guest responses in real-time',
-      icon: UserCheck,
-      color: 'from-blue-500 to-indigo-600'
-    },
-    {
-      id: 'enhanced-shared-access',
-      title: 'Shared Access & Collaborators',
-      description: 'Invite co-hosts, manage collaborators & permissions',
-      icon: UserPlus,
-      color: 'from-yellow-500 to-green-600'
-    },
-    {
-      id: 'whatsapp-bulk-messaging',
-      title: 'WhatsApp Bulk Messaging',
-      description: 'Send bulk messages to multiple contacts',
-      icon: MessageSquare,
-      color: 'from-green-500 to-lime-600'
     },
     {
       id: 'event-templates',
@@ -107,10 +80,24 @@ export const MainMenu = ({
     },
     {
       id: 'vendor-contact-book',
-      title: 'Vendor\'s Contact Book',
+      title: 'Vendor Contact Book',
       description: 'Manage vendor details and payments',
       icon: BookOpen,
       color: 'from-green-500 to-yellow-600'
+    },
+    {
+      id: 'enhanced-shared-access',
+      title: 'Shared Access & Collaborators',
+      description: 'Invite co-hosts, manage collaborators & permissions',
+      icon: UserPlus,
+      color: 'from-yellow-500 to-green-600'
+    },
+    {
+      id: 'whatsapp-bulk-messaging',
+      title: 'WhatsApp Integration',
+      description: 'Send bulk messages to multiple contacts',
+      icon: MessageSquare,
+      color: 'from-green-500 to-lime-600'
     }
   ];
 
@@ -123,18 +110,18 @@ export const MainMenu = ({
       color: 'from-lime-400 to-green-400'
     },
     {
-      id: 'timeline',
-      title: 'Timeline & Planning',
-      description: 'Event planning timeline & milestones',
-      icon: Clock,
-      color: 'from-yellow-400 to-lime-400'
+      id: 'interactive-invite-guests',
+      title: 'Invite Guests',
+      description: 'Generate links, share invites & track RSVPs',
+      icon: Users,
+      color: 'from-coral-500 to-coral-600'
     },
     {
-      id: 'task-checklist',
-      title: 'Task Checklist',
-      description: 'Track tasks and deadlines (connected to timeline)',
-      icon: CheckSquare,
-      color: 'from-blue-400 to-green-400'
+      id: 'enhanced-track-rsvps',
+      title: 'Track RSVPs',
+      description: 'Monitor guest responses in real-time',
+      icon: UserCheck,
+      color: 'from-blue-500 to-indigo-600'
     },
     {
       id: 'settings',
@@ -145,7 +132,7 @@ export const MainMenu = ({
     }
   ];
 
-  // Event-specific quick access items (only show when event is selected)
+  // Event-specific quick access items
   const eventQuickAccessItems = currentEvent ? [
     {
       id: 'edit-event',
@@ -206,10 +193,10 @@ export const MainMenu = ({
           <p className="text-sm opacity-90 lg:text-gray-600">Manage your celebrations</p>
         </div>
 
-        {/* Main Menu Items */}
+        {/* Planning Tools Section */}
         <div className="p-3 md:p-4 space-y-2 md:space-y-3">
           <h3 className="font-semibold text-gray-700 mb-2 md:mb-3 text-sm md:text-base">Planning Tools</h3>
-          {menuItems.map((item) => (
+          {planningTools.map((item) => (
             <Card
               key={item.id}
               className="cursor-pointer hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-r from-yellow-50 to-lime-50 hover:from-yellow-100 hover:to-lime-100"
