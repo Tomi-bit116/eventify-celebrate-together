@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarIcon, Plus, Settings, Users, CheckSquare, Share2, LogOut } from 'lucide-react';
+import { CalendarIcon, Plus, Settings, Users, CheckSquare, Share2, LogOut, DollarSign, FileText } from 'lucide-react';
 import { EventForm } from './EventForm';
 import { EventCard } from './EventCard';
 import { MainMenu } from './MainMenu';
@@ -19,6 +19,9 @@ import { InteractiveInviteGuestsPage } from './dashboard/InteractiveInviteGuests
 import { EnhancedTrackRSVPsPage } from './dashboard/EnhancedTrackRSVPsPage';
 import { MyEventsPage } from './dashboard/MyEventsPage';
 import { CreateEventModal } from './dashboard/CreateEventModal';
+import { BudgetTrackerPage } from './dashboard/BudgetTrackerPage';
+import { EventTemplatesPage } from './dashboard/EventTemplatesPage';
+import { WhatsAppBulkMessagingPage } from './dashboard/WhatsAppBulkMessagingPage';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -127,16 +130,6 @@ export const Dashboard = ({ userId }: DashboardProps) => {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast.success('Signed out successfully');
-      navigate('/auth');
-    } catch (error) {
-      toast.error('Error signing out');
-    }
-  };
-
   const toggleMainMenu = () => {
     setIsMainMenuOpen(!isMainMenuOpen);
   };
@@ -169,176 +162,140 @@ export const Dashboard = ({ userId }: DashboardProps) => {
         return <InteractiveInviteGuestsPage onBack={() => setActiveFeature(null)} currentEvent={selectedEvent} />;
       case 'enhanced-track-rsvps':
         return <EnhancedTrackRSVPsPage onBack={() => setActiveFeature(null)} currentEvent={selectedEvent} />;
+      case 'manage-budget':
+        return <BudgetTrackerPage onBack={() => setActiveFeature(null)} currentEvent={selectedEvent} />;
+      case 'event-templates':
+        return <EventTemplatesPage onBack={() => setActiveFeature(null)} onCreateEvent={handleCreateEvent} />;
+      case 'whatsapp-bulk-messaging':
+        return <WhatsAppBulkMessagingPage onBack={() => setActiveFeature(null)} />;
       default:
         return (
-          <div className="font-montserrat">
-            {/* Welcome Section */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                Welcome back, {getUserDisplayName()}! ✨
-              </h1>
-              <p className="text-gray-600">
-                Ready to plan something amazing? Let's make your next celebration unforgettable.
-              </p>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-              <Card className="bg-gradient-to-r from-coral-500 to-coral-600 text-white">
-                <CardContent className="p-4 text-center">
-                  <CalendarIcon className="w-8 h-8 mx-auto mb-2" />
-                  <h3 className="text-2xl font-bold">{events.length}</h3>
-                  <p className="text-sm opacity-90">Total Events</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-gradient-to-r from-teal-500 to-teal-600 text-white">
-                <CardContent className="p-4 text-center">
-                  <Users className="w-8 h-8 mx-auto mb-2" />
-                  <h3 className="text-2xl font-bold">{events.reduce((acc, event) => acc + (event.expected_guests || 0), 0)}</h3>
-                  <p className="text-sm opacity-90">Guests Invited</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-gradient-to-r from-amber-500 to-amber-600 text-white">
-                <CardContent className="p-4 text-center">
-                  <CheckSquare className="w-8 h-8 mx-auto mb-2" />
-                  <h3 className="text-2xl font-bold">0</h3>
-                  <p className="text-sm opacity-90">Tasks Remaining</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white">
-                <CardContent className="p-4 text-center">
-                  <div className="w-8 h-8 mx-auto mb-2 bg-white/20 rounded-full flex items-center justify-center">
-                    <span className="text-lg">🎯</span>
-                  </div>
-                  <h3 className="text-2xl font-bold">95%</h3>
-                  <p className="text-sm opacity-90">Completion Rate</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              <Button
-                onClick={handleCreateEvent}
-                className="h-20 bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white flex flex-col items-center justify-center space-y-2"
-              >
-                <Plus className="w-6 h-6" />
-                <span>Create Event</span>
-              </Button>
-              <Button
-                onClick={() => setActiveFeature('interactive-invite-guests')}
-                className="h-20 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white flex flex-col items-center justify-center space-y-2"
-              >
-                <Users className="w-6 h-6" />
-                <span>Invite Guests</span>
-              </Button>
-              <Button
-                onClick={() => setActiveFeature('task-checklist')}
-                className="h-20 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white flex flex-col items-center justify-center space-y-2"
-              >
-                <CheckSquare className="w-6 h-6" />
-                <span>View Tasks</span>
-              </Button>
-              <Button
-                onClick={() => setActiveFeature('enhanced-track-rsvps')}
-                className="h-20 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white flex flex-col items-center justify-center space-y-2"
-              >
-                <Users className="w-6 h-6" />
-                <span>Track RSVPs</span>
-              </Button>
-            </div>
-
-            {/* Upcoming Events */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Your Upcoming Events</h2>
-                <Button onClick={() => setActiveFeature('my-events')} variant="outline">
-                  View All Events
-                </Button>
+          <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50">
+            <div className="container mx-auto px-4 py-8">
+              {/* Header */}
+              <div className="text-center mb-12">
+                <h1 className="text-4xl font-bold text-gray-800 mb-4 font-montserrat">
+                  Welcome to Eventify! ✨
+                </h1>
+                <p className="text-xl text-gray-600 font-montserrat">
+                  Hello {getUserDisplayName()}! Ready to plan something amazing?
+                </p>
               </div>
-              
-              {loading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin w-8 h-8 border-4 border-coral-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading your events...</p>
-                </div>
-              ) : events.length === 0 ? (
-                <Card className="text-center py-12">
-                  <CardContent>
-                    <CalendarIcon className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-xl font-semibold text-gray-700 mb-2">No events yet</h3>
-                    <p className="text-gray-500 mb-4">Create your first event to get started!</p>
-                    <Button onClick={handleCreateEvent} className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Your First Event
-                    </Button>
+
+              {/* Navigation Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                {/* Create Event */}
+                <Card 
+                  className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-coral-500 to-coral-600 text-white border-0"
+                  onClick={handleCreateEvent}
+                >
+                  <CardContent className="p-6 text-center">
+                    <Plus className="w-12 h-12 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold mb-2 font-montserrat">Create Event</h3>
+                    <p className="text-coral-100">Start planning your celebration</p>
                   </CardContent>
                 </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {events.slice(0, 6).map((event) => (
-                    <Card key={event.id} className="hover:shadow-lg transition-shadow duration-200">
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg font-bold text-gray-800 truncate">{event.name}</CardTitle>
-                          <div className="flex space-x-1">
+
+                {/* Interactive Guest Invitations */}
+                <Card 
+                  className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-teal-500 to-teal-600 text-white border-0"
+                  onClick={() => setActiveFeature('interactive-invite-guests')}
+                >
+                  <CardContent className="p-6 text-center">
+                    <Users className="w-12 h-12 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold mb-2 font-montserrat">Invite Guests</h3>
+                    <p className="text-teal-100">Send beautiful invitations</p>
+                  </CardContent>
+                </Card>
+
+                {/* Budget Tracker */}
+                <Card 
+                  className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-0"
+                  onClick={() => setActiveFeature('manage-budget')}
+                >
+                  <CardContent className="p-6 text-center">
+                    <DollarSign className="w-12 h-12 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold mb-2 font-montserrat">Budget Tracker</h3>
+                    <p className="text-emerald-100">Manage your expenses</p>
+                  </CardContent>
+                </Card>
+
+                {/* Track RSVPs */}
+                <Card 
+                  className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-gold-500 to-gold-600 text-white border-0"
+                  onClick={() => setActiveFeature('enhanced-track-rsvps')}
+                >
+                  <CardContent className="p-6 text-center">
+                    <CheckSquare className="w-12 h-12 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold mb-2 font-montserrat">Track RSVPs</h3>
+                    <p className="text-gold-100">Monitor guest responses</p>
+                  </CardContent>
+                </Card>
+
+                {/* Event Templates */}
+                <Card 
+                  className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0"
+                  onClick={() => setActiveFeature('event-templates')}
+                >
+                  <CardContent className="p-6 text-center">
+                    <FileText className="w-12 h-12 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold mb-2 font-montserrat">Event Templates</h3>
+                    <p className="text-purple-100">Quick setup templates</p>
+                  </CardContent>
+                </Card>
+
+                {/* WhatsApp Integration */}
+                <Card 
+                  className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-green-500 to-green-600 text-white border-0"
+                  onClick={() => setActiveFeature('whatsapp-bulk-messaging')}
+                >
+                  <CardContent className="p-6 text-center">
+                    <Share2 className="w-12 h-12 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold mb-2 font-montserrat">WhatsApp Bulk</h3>
+                    <p className="text-green-100">Send bulk messages</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Recent Events Summary */}
+              {events.length > 0 && (
+                <div className="mt-12 max-w-4xl mx-auto">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center font-montserrat">Your Recent Events</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {events.slice(0, 4).map((event) => (
+                      <Card key={event.id} className="hover:shadow-lg transition-shadow duration-200 bg-white/90 backdrop-blur-sm border-0">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg font-bold text-gray-800 flex items-center justify-between">
+                            <span className="truncate">{event.name}</span>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleShareEvent(event)}
-                              className="hover:bg-green-100 text-green-600"
-                              title="Share Event"
+                              onClick={() => handleEventSelect(event)}
+                              className="text-coral-600 hover:text-coral-700"
                             >
-                              <Share2 className="w-4 h-4" />
+                              Manage
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditEvent(event)}
-                              className="hover:bg-blue-100 text-blue-600"
-                              title="Edit Event"
-                            >
-                              <Settings className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <p className="text-gray-600 text-sm line-clamp-2">{event.description}</p>
-                        
-                        <div className="flex items-center text-sm text-gray-600">
-                          <CalendarIcon className="w-4 h-4 mr-2 text-blue-500" />
-                          <span>{new Date(event.event_date).toLocaleDateString()}</span>
-                          {event.event_time && <span className="ml-2">at {event.event_time}</span>}
-                        </div>
-                        
-                        {event.venue && (
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
                           <div className="flex items-center text-sm text-gray-600">
-                            <span className="w-4 h-4 mr-2 text-green-500">📍</span>
-                            <span className="truncate">{event.venue}</span>
+                            <CalendarIcon className="w-4 h-4 mr-2 text-coral-500" />
+                            <span>{new Date(event.event_date).toLocaleDateString()}</span>
                           </div>
-                        )}
-                        
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Users className="w-4 h-4 mr-2 text-purple-500" />
-                          <span>{event.expected_guests || 0} expected guests</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center pt-2">
-                          <span className="text-sm font-medium text-gray-700">
-                            Budget: ${event.budget?.toLocaleString() || '0'}
-                          </span>
-                          <Button
-                            onClick={() => handleEventSelect(event)}
-                            size="sm"
-                            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-                          >
-                            Manage
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                          {event.venue && (
+                            <div className="flex items-center text-sm text-gray-600">
+                              <span className="w-4 h-4 mr-2 text-teal-500">📍</span>
+                              <span className="truncate">{event.venue}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Users className="w-4 h-4 mr-2 text-emerald-500" />
+                            <span>{event.expected_guests || 0} guests</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -348,7 +305,7 @@ export const Dashboard = ({ userId }: DashboardProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 font-montserrat">
       {/* Quick Start Guide for New Users */}
       {showQuickStartGuide && (
         <NewUserQuickStartGuide onClose={() => setShowQuickStartGuide(false)} />
@@ -373,40 +330,7 @@ export const Dashboard = ({ userId }: DashboardProps) => {
         />
       )}
 
-      <div className="container mx-auto px-4 py-8">
-        <header className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">
-              {selectedEvent ? selectedEvent.name : 'My Events'}
-            </h1>
-            <p className="text-gray-600">
-              {selectedEvent
-                ? 'Manage your event details and planning'
-                : 'Select an event to manage, or create a new one.'}
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            {selectedEvent && (
-              <>
-                <Button onClick={() => handleEditEvent(selectedEvent)}>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Edit Event
-                </Button>
-                <Button onClick={() => handleShareEvent(selectedEvent)} variant="outline">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share
-                </Button>
-              </>
-            )}
-            <Button onClick={handleSignOut} variant="outline" className="text-red-600 hover:bg-red-50">
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
-        </header>
-
-        {renderFeature()}
-      </div>
+      {renderFeature()}
     </div>
   );
 };

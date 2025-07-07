@@ -92,9 +92,9 @@ export const MainMenu = ({
       color: 'from-yellow-500 to-green-600'
     },
     {
-      id: 'enhanced-whatsapp-integration',
-      title: 'WhatsApp Integration',
-      description: 'Share updates & communicate via WhatsApp',
+      id: 'whatsapp-bulk-messaging',
+      title: 'WhatsApp Bulk Messaging',
+      description: 'Send bulk messages to multiple contacts',
       icon: MessageSquare,
       color: 'from-green-500 to-lime-600'
     },
@@ -202,7 +202,7 @@ export const MainMenu = ({
         
         {/* Menu Header */}
         <div className="p-4 md:p-6 bg-gradient-to-r from-yellow-500 to-green-500 text-white lg:bg-none lg:text-gray-800">
-          <h2 className="text-lg md:text-xl font-bold mb-2">Event Features</h2>
+          <h2 className="text-lg md:text-xl font-bold mb-2">Eventify</h2>
           <p className="text-sm opacity-90 lg:text-gray-600">Manage your celebrations</p>
         </div>
 
