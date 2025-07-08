@@ -1,8 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarIcon, Plus, Users, CheckSquare, DollarSign } from 'lucide-react';
 import { MainMenu } from './MainMenu';
 import { NewUserQuickStartGuide } from './dashboard/NewUserQuickStartGuide';
 import { InteractiveInviteGuestsPage } from './dashboard/InteractiveInviteGuestsPage';
@@ -104,6 +101,10 @@ export const Dashboard = ({ userId }: DashboardProps) => {
     switch (activeFeature) {
       case 'my-events':
         return <MyEventsPage onBack={() => setActiveFeature(null)} onEventSelect={handleEventSelect} onCreateEvent={handleCreateEvent} />;
+      case 'create-event':
+        setIsEventFormOpen(true);
+        setActiveFeature(null);
+        return null;
       case 'interactive-invite-guests':
         return <InteractiveInviteGuestsPage onBack={() => setActiveFeature(null)} currentEvent={selectedEvent} />;
       case 'enhanced-track-rsvps':
@@ -134,86 +135,21 @@ export const Dashboard = ({ userId }: DashboardProps) => {
                 </p>
               </div>
 
-              {/* Quick Actions - Only Essential Features */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
-                {/* Create Event */}
-                <Card 
-                  className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-coral-500 to-coral-600 text-white border-0"
-                  onClick={handleCreateEvent}
-                >
-                  <CardContent className="p-6 text-center">
-                    <Plus className="w-12 h-12 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold mb-2 font-montserrat">Create Event</h3>
-                    <p className="text-coral-100">Start planning your celebration</p>
-                  </CardContent>
-                </Card>
-
-                {/* Invite Guests */}
-                <Card 
-                  className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-teal-500 to-teal-600 text-white border-0"
-                  onClick={() => setActiveFeature('interactive-invite-guests')}
-                >
-                  <CardContent className="p-6 text-center">
-                    <Users className="w-12 h-12 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold mb-2 font-montserrat">Invite Guests</h3>
-                    <p className="text-teal-100">Send beautiful invitations</p>
-                  </CardContent>
-                </Card>
-
-                {/* Track RSVPs */}
-                <Card 
-                  className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-0"
-                  onClick={() => setActiveFeature('enhanced-track-rsvps')}
-                >
-                  <CardContent className="p-6 text-center">
-                    <CheckSquare className="w-12 h-12 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold mb-2 font-montserrat">Track RSVPs</h3>
-                    <p className="text-emerald-100">Monitor guest responses</p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Recent Events Summary */}
-              {events.length > 0 && (
-                <div className="max-w-4xl mx-auto">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center font-montserrat">Your Recent Events</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {events.slice(0, 4).map((event) => (
-                      <Card key={event.id} className="hover:shadow-lg transition-shadow duration-200 bg-white/90 backdrop-blur-sm border-0">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-lg font-bold text-gray-800 flex items-center justify-between">
-                            <span className="truncate">{event.name}</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEventSelect(event)}
-                              className="text-coral-600 hover:text-coral-700"
-                            >
-                              Manage
-                            </Button>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                          <div className="flex items-center text-sm text-gray-600">
-                            <CalendarIcon className="w-4 h-4 mr-2 text-coral-500" />
-                            <span>{new Date(event.event_date).toLocaleDateString()}</span>
-                          </div>
-                          {event.venue && (
-                            <div className="flex items-center text-sm text-gray-600">
-                              <span className="w-4 h-4 mr-2 text-teal-500">📍</span>
-                              <span className="truncate">{event.venue}</span>
-                            </div>
-                          )}
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Users className="w-4 h-4 mr-2 text-emerald-500" />
-                            <span>{event.expected_guests || 0} guests</span>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+              {/* Simple Welcome Card */}
+              <div className="max-w-2xl mx-auto">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-lg border-0 text-center">
+                  <div className="text-6xl mb-4">🎉</div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4 font-montserrat">
+                    Let's Create Something Special
+                  </h2>
+                  <p className="text-gray-600 mb-6">
+                    Use the menu to access all your planning tools and manage your events.
+                  </p>
+                  <div className="text-sm text-gray-500">
+                    Click the menu button to get started!
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         );
@@ -235,6 +171,8 @@ export const Dashboard = ({ userId }: DashboardProps) => {
         currentEvent={selectedEvent}
         onEditEvent={() => handleEditEvent(selectedEvent)}
         onShareEvent={() => handleShareEvent(selectedEvent)}
+        onCreateEvent={handleCreateEvent}
+        events={events}
       />
 
       {/* Create Event Modal */}

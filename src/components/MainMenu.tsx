@@ -19,7 +19,8 @@ import {
   Settings,
   LogOut,
   Edit,
-  Share2
+  Share2,
+  CalendarIcon
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -32,6 +33,8 @@ interface MainMenuProps {
   currentEvent?: any;
   onEditEvent?: () => void;
   onShareEvent?: () => void;
+  onCreateEvent?: () => void;
+  events?: any[];
 }
 
 export const MainMenu = ({ 
@@ -40,7 +43,9 @@ export const MainMenu = ({
   onToggle, 
   currentEvent,
   onEditEvent,
-  onShareEvent 
+  onShareEvent,
+  onCreateEvent,
+  events = []
 }: MainMenuProps) => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -55,7 +60,7 @@ export const MainMenu = ({
     }
   };
 
-  // Planning Tools - All moved here from dashboard
+  // Planning Tools
   const planningTools = [
     {
       id: 'task-checklist',
@@ -101,27 +106,35 @@ export const MainMenu = ({
     }
   ];
 
+  // Quick Access Items - now includes main features
   const quickAccessItems = [
     {
-      id: 'my-events',
-      title: 'My Events',
-      description: 'View all celebrations',
-      icon: Calendar,
-      color: 'from-lime-400 to-green-400'
+      id: 'create-event',
+      title: 'Create Event',
+      description: 'Start planning your celebration',
+      icon: Plus,
+      color: 'from-coral-500 to-coral-600'
     },
     {
       id: 'interactive-invite-guests',
       title: 'Invite Guests',
       description: 'Generate links, share invites & track RSVPs',
       icon: Users,
-      color: 'from-coral-500 to-coral-600'
+      color: 'from-teal-500 to-teal-600'
     },
     {
       id: 'enhanced-track-rsvps',
       title: 'Track RSVPs',
       description: 'Monitor guest responses in real-time',
       icon: UserCheck,
-      color: 'from-blue-500 to-indigo-600'
+      color: 'from-emerald-500 to-emerald-600'
+    },
+    {
+      id: 'my-events',
+      title: 'My Events',
+      description: 'View all celebrations',
+      icon: Calendar,
+      color: 'from-lime-400 to-green-400'
     },
     {
       id: 'settings',
@@ -155,6 +168,8 @@ export const MainMenu = ({
   const handleItemClick = (itemId: string, customAction?: () => void) => {
     if (customAction) {
       customAction();
+    } else if (itemId === 'create-event' && onCreateEvent) {
+      onCreateEvent();
     } else {
       onFeatureClick(itemId);
     }
@@ -169,7 +184,7 @@ export const MainMenu = ({
       {/* Mobile Menu Button */}
       <Button
         onClick={onToggle}
-        className="lg:hidden fixed top-4 right-4 z-50 bg-gradient-to-r from-yellow-500 to-lime-500 text-white p-2 rounded-full shadow-lg"
+        className="lg:hidden fixed top-4 right-4 z-50 bg-gradient-to-r from-coral-500 to-coral-600 text-white p-2 rounded-full shadow-lg"
       >
         {isOpen ? <X className="w-5 h-5 md:w-6 md:h-6" /> : <Menu className="w-5 h-5 md:w-6 md:h-6" />}
       </Button>
@@ -188,40 +203,15 @@ export const MainMenu = ({
       } lg:relative lg:translate-x-0 lg:w-64 lg:shadow-none lg:bg-transparent`}>
         
         {/* Menu Header */}
-        <div className="p-4 md:p-6 bg-gradient-to-r from-yellow-500 to-green-500 text-white lg:bg-none lg:text-gray-800">
+        <div className="p-4 md:p-6 bg-gradient-to-r from-coral-500 to-teal-500 text-white lg:bg-none lg:text-gray-800">
           <h2 className="text-lg md:text-xl font-bold mb-2">Eventify</h2>
           <p className="text-sm opacity-90 lg:text-gray-600">Manage your celebrations</p>
         </div>
 
-        {/* Planning Tools Section */}
-        <div className="p-3 md:p-4 space-y-2 md:space-y-3">
-          <h3 className="font-semibold text-gray-700 mb-2 md:mb-3 text-sm md:text-base">Planning Tools</h3>
-          {planningTools.map((item) => (
-            <Card
-              key={item.id}
-              className="cursor-pointer hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-r from-yellow-50 to-lime-50 hover:from-yellow-100 hover:to-lime-100"
-              onClick={() => handleItemClick(item.id)}
-            >
-              <CardContent className="p-3 md:p-4">
-                <div className="flex items-center space-x-2 md:space-x-3">
-                  <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center flex-shrink-0`}>
-                    <item.icon className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-800 text-sm md:text-base truncate">{item.title}</h4>
-                    <p className="text-xs text-gray-600 line-clamp-2">{item.description}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
         {/* Quick Access Section */}
-        <div className="p-3 md:p-4 border-t border-gray-200">
+        <div className="p-3 md:p-4 space-y-2 md:space-y-3">
           <h3 className="font-semibold text-gray-700 mb-2 md:mb-3 text-sm md:text-base">Quick Access</h3>
           
-          {/* Regular Quick Access Items */}
           {quickAccessItems.map((item) => (
             <Card
               key={`${item.id}-${item.title}`}
@@ -248,6 +238,67 @@ export const MainMenu = ({
               key={item.id}
               className="cursor-pointer hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 mb-2"
               onClick={() => handleItemClick(item.id, item.action)}
+            >
+              <CardContent className="p-2 md:p-3">
+                <div className="flex items-center space-x-2 md:space-x-3">
+                  <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center flex-shrink-0`}>
+                    <item.icon className="w-3 h-3 md:w-4 md:h-4 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-gray-800 text-xs md:text-sm truncate">{item.title}</h4>
+                    <p className="text-xs text-gray-600 line-clamp-1">{item.description}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Recent Events Section */}
+        {events.length > 0 && (
+          <div className="p-3 md:p-4 border-t border-gray-200">
+            <h3 className="font-semibold text-gray-700 mb-2 md:mb-3 text-sm md:text-base">Recent Events</h3>
+            <div className="space-y-2">
+              {events.slice(0, 3).map((event) => (
+                <Card key={event.id} className="hover:shadow-lg transition-shadow duration-200 bg-white/90 backdrop-blur-sm border-0">
+                  <CardContent className="p-2 md:p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-800 text-xs md:text-sm truncate">{event.name}</h4>
+                        <div className="flex items-center text-xs text-gray-600 mt-1">
+                          <CalendarIcon className="w-3 h-3 mr-1 text-coral-500" />
+                          <span>{new Date(event.event_date).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          onFeatureClick('my-events');
+                          if (window.innerWidth < 1024) {
+                            onToggle();
+                          }
+                        }}
+                        className="text-coral-600 hover:text-coral-700 text-xs"
+                      >
+                        View
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Planning Tools Section */}
+        <div className="p-3 md:p-4 border-t border-gray-200">
+          <h3 className="font-semibold text-gray-700 mb-2 md:mb-3 text-sm md:text-base">Planning Tools</h3>
+          {planningTools.map((item) => (
+            <Card
+              key={item.id}
+              className="cursor-pointer hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-r from-yellow-50 to-lime-50 hover:from-yellow-100 hover:to-lime-100 mb-2"
+              onClick={() => handleItemClick(item.id)}
             >
               <CardContent className="p-2 md:p-3">
                 <div className="flex items-center space-x-2 md:space-x-3">

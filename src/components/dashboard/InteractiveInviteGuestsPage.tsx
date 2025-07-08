@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Users, Share2, Copy, Mail, MessageSquare, Link as LinkIcon, Send, QrCode, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Users, Share2, Copy, Mail, MessageSquare, Link as LinkIcon, Send, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -44,7 +44,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
 
       const fullLink = `${window.location.origin}/rsvp/${data}`;
       setInvitationLink(fullLink);
-      toast.success('Invitation link generated successfully!');
+      toast.success('Invitation link generated successfully! 🎉');
     } catch (error) {
       console.error('Error generating invitation link:', error);
       toast.error('Failed to generate invitation link');
@@ -61,7 +61,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(invitationLink);
-      toast.success('Link copied to clipboard!');
+      toast.success('Link copied to clipboard! 📋');
     } catch (error) {
       toast.error('Failed to copy link');
     }
@@ -71,7 +71,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
     const message = `${customMessage}\n\n${invitationLink}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
-    toast.success('Shared via WhatsApp!');
+    toast.success('Shared via WhatsApp! 📱');
   };
 
   const shareViaEmail = () => {
@@ -79,21 +79,20 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
     const body = `${customMessage}\n\n${invitationLink}`;
     const emailUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(emailUrl);
-    toast.success('Email invitation opened!');
+    toast.success('Email invitation opened! 📧');
   };
 
   const shareViaSMS = () => {
     const message = `${customMessage}\n\n${invitationLink}`;
     const smsUrl = `sms:?body=${encodeURIComponent(message)}`;
     window.open(smsUrl);
-    toast.success('SMS invitation opened!');
+    toast.success('SMS invitation opened! 📲');
   };
 
   const bulkShare = () => {
-    // Copy the invitation message and link for bulk sharing
     const bulkMessage = `${customMessage}\n\n${invitationLink}`;
     navigator.clipboard.writeText(bulkMessage);
-    toast.success('Bulk invitation message copied! You can now paste this in your group chats or messaging apps.');
+    toast.success('Bulk invitation message copied! You can now paste this in your group chats or messaging apps. 📋');
   };
 
   return (
@@ -108,9 +107,9 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-800 flex items-center">
               <Users className="w-8 h-8 mr-3 text-coral-600" />
-              Interactive Guest Invitations
+              Invite Guests
             </h1>
-            <p className="text-gray-600 mt-2">Generate and share beautiful invitations for {currentEvent?.name || 'your event'}</p>
+            <p className="text-gray-600 mt-2">Generate and share invitation links for {currentEvent?.name || 'your event'}</p>
           </div>
         </div>
 
@@ -193,7 +192,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
                       <Copy className="w-4 h-4" />
                     </Button>
                   </div>
-                  <p className="text-xs text-green-700 mt-2">✅ This link is ready to share!</p>
+                  <p className="text-xs text-green-700 mt-2">✅ This link is ready to share! Guests will be taken to an RSVP form when they click it.</p>
                 </div>
               )}
             </CardContent>
@@ -286,7 +285,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
               <p>3. <strong>Share</strong> the link via WhatsApp, email, SMS, or bulk copy</p>
               <p>4. <strong>Guests click</strong> the link and fill out a simple RSVP form</p>
               <p>5. <strong>Track responses</strong> in real-time under "Track RSVPs"</p>
-              <p>6. <strong>Send reminders</strong> and manage your guest list easily</p>
+              <p>6. <strong>Registered guests</strong> will automatically appear in your event guest list</p>
             </div>
           </CardContent>
         </Card>
