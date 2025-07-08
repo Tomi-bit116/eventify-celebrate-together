@@ -40,6 +40,8 @@ export const RSVPForm = () => {
       if (!invitationCode) return;
 
       try {
+        console.log('Fetching event data for invitation code:', invitationCode);
+        
         // First, get the invitation details
         const { data: invitation, error: invitationError } = await supabase
           .from('invitations')
@@ -48,6 +50,7 @@ export const RSVPForm = () => {
           .single();
 
         if (invitationError || !invitation) {
+          console.error('Invitation error:', invitationError);
           toast.error('Invalid invitation link');
           return;
         }
@@ -72,10 +75,12 @@ export const RSVPForm = () => {
           .single();
 
         if (eventError || !event) {
+          console.error('Event error:', eventError);
           toast.error('Event not found');
           return;
         }
 
+        console.log('Event data loaded:', event);
         setEventData(event);
       } catch (error) {
         console.error('Error fetching event data:', error);
@@ -104,6 +109,15 @@ export const RSVPForm = () => {
     setIsSubmitting(true);
 
     try {
+      console.log('Submitting RSVP:', {
+        invitation_id: invitationId,
+        event_id: eventData.id,
+        guest_name: formData.guestName.trim(),
+        guest_email: formData.guestEmail.trim() || null,
+        guest_phone: formData.guestPhone.trim() || null,
+        rsvp_status: formData.rsvpStatus
+      });
+
       const { error } = await supabase
         .from('rsvps')
         .insert({
@@ -115,10 +129,14 @@ export const RSVPForm = () => {
           rsvp_status: formData.rsvpStatus
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('RSVP submission error:', error);
+        throw error;
+      }
 
+      console.log('RSVP submitted successfully');
       setIsSubmitted(true);
-      toast.success('RSVP submitted successfully!');
+      toast.success('RSVP submitted successfully! 🎉');
     } catch (error) {
       console.error('Error submitting RSVP:', error);
       toast.error('Failed to submit RSVP. Please try again.');
@@ -133,10 +151,10 @@ export const RSVPForm = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4 font-montserrat">
-        <Card className="w-full max-w-md shadow-2xl">
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-2xl bg-white/90 backdrop-blur-sm">
           <CardContent className="p-8 text-center">
-            <div className="animate-spin w-8 h-8 border-4 border-coral-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"></div>
             <p className="text-gray-600">Loading event details...</p>
           </CardContent>
         </Card>
@@ -146,8 +164,8 @@ export const RSVPForm = () => {
 
   if (!eventData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4 font-montserrat">
-        <Card className="w-full max-w-md shadow-2xl">
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-2xl bg-white/90 backdrop-blur-sm">
           <CardContent className="p-8 text-center">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">❌</span>
@@ -155,9 +173,9 @@ export const RSVPForm = () => {
             <h2 className="text-xl font-bold text-red-600 mb-4">Invitation Not Found</h2>
             <p className="text-gray-600 mb-4">This invitation link is invalid or has expired.</p>
             <p className="text-gray-500 text-sm mb-6">Please check your invitation link and try again, or contact the event host.</p>
-            <Button onClick={goToHomepage} className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white">
+            <Button onClick={goToHomepage} className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Go to Homepage
+              Go to Eventify
             </Button>
           </CardContent>
         </Card>
@@ -167,28 +185,49 @@ export const RSVPForm = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4 font-montserrat">
-        <Card className="w-full max-w-md shadow-2xl">
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-2xl bg-white/90 backdrop-blur-sm">
           <CardContent className="p-8 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Thank You!</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Thank You! 🎉</h2>
             <p className="text-gray-600 mb-4">
               Your RSVP for <strong>{eventData.name}</strong> has been received.
             </p>
-            <div className="bg-gradient-to-r from-coral-50 to-teal-50 p-4 rounded-lg mb-4">
+            <div className="bg-gradient-to-r from-yellow-50 to-green-50 p-4 rounded-lg mb-4">
               <p className="text-sm text-gray-700 mb-2">
                 <strong>Your Response:</strong> {formData.rsvpStatus === 'yes' ? '✅ Yes, I\'ll be there!' : formData.rsvpStatus === 'maybe' ? '🤔 Maybe' : '❌ Sorry, can\'t make it'}
               </p>
               <p className="text-sm text-gray-700">
-                We've sent a confirmation to the event host.
+                The event host has been notified of your response.
               </p>
             </div>
+            <div className="bg-orange-50 p-4 rounded-lg mb-6">
+              <h3 className="font-semibold text-orange-800 mb-2">Event Details:</h3>
+              <div className="space-y-1 text-sm text-orange-700">
+                <div className="flex items-center space-x-2">
+                  <Calendar className="w-4 h-4" />
+                  <span>{new Date(eventData.event_date).toLocaleDateString()}</span>
+                </div>
+                {eventData.event_time && (
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-4 h-4" />
+                    <span>{eventData.event_time}</span>
+                  </div>
+                )}
+                {eventData.venue && (
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="w-4 h-4" />
+                    <span>{eventData.venue}</span>
+                  </div>
+                )}
+              </div>
+            </div>
             <p className="text-sm text-gray-500 mb-6">
-              We're excited to celebrate with you! 🎉
+              We're excited to celebrate with you! 🎊
             </p>
-            <Button onClick={goToHomepage} className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white">
+            <Button onClick={goToHomepage} className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Visit Eventify
             </Button>
@@ -199,14 +238,14 @@ export const RSVPForm = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 flex items-center justify-center p-4 font-montserrat">
-      <Card className="w-full max-w-lg shadow-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-lg shadow-2xl bg-white/90 backdrop-blur-sm">
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-2xl font-bold text-gray-800 mb-4">
             You're Invited! 🎉
           </CardTitle>
           <div className="space-y-2">
-            <h3 className="text-xl font-semibold text-coral-600">{eventData.name}</h3>
+            <h3 className="text-xl font-semibold text-orange-600">{eventData.name}</h3>
             {eventData.description && (
               <p className="text-gray-600 text-sm">{eventData.description}</p>
             )}
@@ -215,9 +254,9 @@ export const RSVPForm = () => {
 
         <CardContent className="space-y-6">
           {/* Event Details */}
-          <div className="bg-gradient-to-r from-coral-50 to-teal-50 p-4 rounded-lg space-y-3">
+          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg space-y-3">
             <div className="flex items-center space-x-3 text-sm">
-              <Calendar className="w-4 h-4 text-coral-600" />
+              <Calendar className="w-4 h-4 text-orange-600" />
               <span className="font-medium text-gray-700">
                 {new Date(eventData.event_date).toLocaleDateString('en-US', {
                   weekday: 'long',
@@ -230,21 +269,21 @@ export const RSVPForm = () => {
             
             {eventData.event_time && (
               <div className="flex items-center space-x-3 text-sm">
-                <Clock className="w-4 h-4 text-teal-600" />
+                <Clock className="w-4 h-4 text-green-600" />
                 <span className="text-gray-700">{eventData.event_time}</span>
               </div>
             )}
             
             {eventData.venue && (
               <div className="flex items-center space-x-3 text-sm">
-                <MapPin className="w-4 h-4 text-emerald-600" />
+                <MapPin className="w-4 h-4 text-yellow-600" />
                 <span className="text-gray-700">{eventData.venue}</span>
               </div>
             )}
 
             {eventData.expected_guests && (
               <div className="flex items-center space-x-3 text-sm">
-                <Users className="w-4 h-4 text-gold-600" />
+                <Users className="w-4 h-4 text-orange-600" />
                 <span className="text-gray-700">{eventData.expected_guests} expected guests</span>
               </div>
             )}
@@ -254,7 +293,7 @@ export const RSVPForm = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="guestName" className="text-sm font-medium">
-                Your Name *
+                Your Full Name *
               </Label>
               <Input
                 id="guestName"
@@ -333,7 +372,7 @@ export const RSVPForm = () => {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white py-3"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3"
             >
               {isSubmitting ? 'Submitting...' : 'Submit RSVP'}
             </Button>

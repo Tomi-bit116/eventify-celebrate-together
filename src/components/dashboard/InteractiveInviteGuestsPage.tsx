@@ -50,7 +50,6 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
       console.log('Generated invitation code:', data);
 
       if (data) {
-        // Use the correct URL format for RSVP
         const fullLink = `${window.location.origin}/rsvp/${data}`;
         setInvitationLink(fullLink);
         toast.success('Invitation link generated successfully! 🎉');
@@ -131,7 +130,6 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
     const message = `${customMessage}\n\n${invitationLink}`;
     navigator.clipboard.writeText(message).then(() => {
       toast.success('Invitation copied! Open Instagram and paste in Stories or DMs. 📋');
-      // Open Instagram web version
       window.open('https://www.instagram.com/', '_blank');
     }).catch(() => {
       toast.error('Failed to copy message');
