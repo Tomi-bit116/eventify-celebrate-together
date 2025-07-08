@@ -35,19 +35,30 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
     setIsGenerating(true);
     
     try {
+      console.log('Generating invitation link for event:', currentEvent.id, 'user:', user.id);
+      
       const { data, error } = await supabase.rpc('generate_invitation_link', {
         event_id_param: currentEvent.id,
         user_id_param: user.id
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error generating invitation link:', error);
+        throw error;
+      }
 
-      const fullLink = `${window.location.origin}/rsvp/${data}`;
-      setInvitationLink(fullLink);
-      toast.success('Invitation link generated successfully! 🎉');
+      console.log('Generated invitation code:', data);
+
+      if (data) {
+        const fullLink = `${window.location.origin}/rsvp/${data}`;
+        setInvitationLink(fullLink);
+        toast.success('Invitation link generated successfully! 🎉');
+      } else {
+        throw new Error('No invitation code returned');
+      }
     } catch (error) {
       console.error('Error generating invitation link:', error);
-      toast.error('Failed to generate invitation link');
+      toast.error('Failed to generate invitation link. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -160,7 +171,14 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
                   disabled={isGenerating || !currentEvent}
                   className="flex-1 bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white"
                 >
-                  {isGenerating ? 'Generating...' : 'Generate Invitation Link'}
+                  {isGenerating ? (
+                    <div className="flex items-center">
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Generating...
+                    </div>
+                  ) : (
+                    'Generate Invitation Link'
+                  )}
                 </Button>
                 
                 {invitationLink && (

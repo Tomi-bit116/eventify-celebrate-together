@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { EventCard } from './EventCard';
 import { EmptyEventsState } from './EmptyEventsState';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface MyEventsPageProps {
   onBack: () => void;
@@ -130,6 +131,38 @@ export const MyEventsPage = ({ onBack, onEventSelect, onCreateEvent }: MyEventsP
             Create Event
           </Button>
         </div>
+
+        {/* Recent Events Section */}
+        {events.length > 0 && (
+          <Card className="mb-6 shadow-lg bg-white/90 backdrop-blur-sm border-0">
+            <CardHeader>
+              <CardTitle className="text-lg text-gray-800">Recent Events</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {events.slice(0, 5).map((event) => (
+                  <div key={event.id} className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-800 text-sm truncate">{event.name}</h4>
+                      <div className="flex items-center text-xs text-gray-600 mt-1">
+                        <Calendar className="w-3 h-3 mr-1 text-blue-500" />
+                        <span>{new Date(event.event_date).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEventSelect(event)}
+                      className="text-blue-600 hover:text-blue-700 text-xs"
+                    >
+                      Select
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Events Grid */}
         {events.length === 0 ? (

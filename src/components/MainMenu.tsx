@@ -15,11 +15,8 @@ import {
   CheckSquare, 
   BookOpen,
   Calendar,
-  Clock,
   Settings,
   LogOut,
-  Edit,
-  Share2,
   CalendarIcon
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -60,8 +57,36 @@ export const MainMenu = ({
     }
   };
 
-  // Planning Tools
-  const planningTools = [
+  // All menu items in one section
+  const menuItems = [
+    {
+      id: 'create-event',
+      title: 'Create Event',
+      description: 'Start planning your celebration',
+      icon: Plus,
+      color: 'from-coral-500 to-coral-600'
+    },
+    {
+      id: 'my-events',
+      title: 'My Events',
+      description: 'View all celebrations',
+      icon: Calendar,
+      color: 'from-lime-400 to-green-400'
+    },
+    {
+      id: 'interactive-invite-guests',
+      title: 'Invite Guests',
+      description: 'Generate links, share invites & track RSVPs',
+      icon: Users,
+      color: 'from-teal-500 to-teal-600'
+    },
+    {
+      id: 'enhanced-track-rsvps',
+      title: 'Track RSVPs',
+      description: 'Monitor guest responses in real-time',
+      icon: UserCheck,
+      color: 'from-emerald-500 to-emerald-600'
+    },
     {
       id: 'task-checklist',
       title: 'Task Checklist',
@@ -103,38 +128,6 @@ export const MainMenu = ({
       description: 'Send bulk messages to multiple contacts',
       icon: MessageSquare,
       color: 'from-green-500 to-lime-600'
-    }
-  ];
-
-  // Quick Access Items - now includes main features
-  const quickAccessItems = [
-    {
-      id: 'create-event',
-      title: 'Create Event',
-      description: 'Start planning your celebration',
-      icon: Plus,
-      color: 'from-coral-500 to-coral-600'
-    },
-    {
-      id: 'interactive-invite-guests',
-      title: 'Invite Guests',
-      description: 'Generate links, share invites & track RSVPs',
-      icon: Users,
-      color: 'from-teal-500 to-teal-600'
-    },
-    {
-      id: 'enhanced-track-rsvps',
-      title: 'Track RSVPs',
-      description: 'Monitor guest responses in real-time',
-      icon: UserCheck,
-      color: 'from-emerald-500 to-emerald-600'
-    },
-    {
-      id: 'my-events',
-      title: 'My Events',
-      description: 'View all celebrations',
-      icon: Calendar,
-      color: 'from-lime-400 to-green-400'
     },
     {
       id: 'settings',
@@ -144,26 +137,6 @@ export const MainMenu = ({
       color: 'from-green-400 to-emerald-400'
     }
   ];
-
-  // Event-specific quick access items
-  const eventQuickAccessItems = currentEvent ? [
-    {
-      id: 'edit-event',
-      title: 'Edit Event',
-      description: 'Modify event details',
-      icon: Edit,
-      color: 'from-blue-400 to-indigo-400',
-      action: onEditEvent
-    },
-    {
-      id: 'share-event',
-      title: 'Share Event',
-      description: 'Share on social media',
-      icon: Share2,
-      color: 'from-purple-400 to-pink-400',
-      action: onShareEvent
-    }
-  ] : [];
 
   const handleItemClick = (itemId: string, customAction?: () => void) => {
     if (customAction) {
@@ -208,96 +181,12 @@ export const MainMenu = ({
           <p className="text-sm opacity-90 lg:text-gray-600">Manage your celebrations</p>
         </div>
 
-        {/* Quick Access Section */}
+        {/* Menu Items */}
         <div className="p-3 md:p-4 space-y-2 md:space-y-3">
-          <h3 className="font-semibold text-gray-700 mb-2 md:mb-3 text-sm md:text-base">Quick Access</h3>
-          
-          {quickAccessItems.map((item) => (
+          {menuItems.map((item) => (
             <Card
               key={`${item.id}-${item.title}`}
               className="cursor-pointer hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-r from-green-50 to-lime-50 hover:from-green-100 hover:to-lime-100 mb-2"
-              onClick={() => handleItemClick(item.id)}
-            >
-              <CardContent className="p-2 md:p-3">
-                <div className="flex items-center space-x-2 md:space-x-3">
-                  <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center flex-shrink-0`}>
-                    <item.icon className="w-3 h-3 md:w-4 md:h-4 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-800 text-xs md:text-sm truncate">{item.title}</h4>
-                    <p className="text-xs text-gray-600 line-clamp-1">{item.description}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-
-          {/* Event-Specific Quick Access Items */}
-          {eventQuickAccessItems.map((item) => (
-            <Card
-              key={item.id}
-              className="cursor-pointer hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 mb-2"
-              onClick={() => handleItemClick(item.id, item.action)}
-            >
-              <CardContent className="p-2 md:p-3">
-                <div className="flex items-center space-x-2 md:space-x-3">
-                  <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center flex-shrink-0`}>
-                    <item.icon className="w-3 h-3 md:w-4 md:h-4 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-800 text-xs md:text-sm truncate">{item.title}</h4>
-                    <p className="text-xs text-gray-600 line-clamp-1">{item.description}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Recent Events Section */}
-        {events.length > 0 && (
-          <div className="p-3 md:p-4 border-t border-gray-200">
-            <h3 className="font-semibold text-gray-700 mb-2 md:mb-3 text-sm md:text-base">Recent Events</h3>
-            <div className="space-y-2">
-              {events.slice(0, 3).map((event) => (
-                <Card key={event.id} className="hover:shadow-lg transition-shadow duration-200 bg-white/90 backdrop-blur-sm border-0">
-                  <CardContent className="p-2 md:p-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-800 text-xs md:text-sm truncate">{event.name}</h4>
-                        <div className="flex items-center text-xs text-gray-600 mt-1">
-                          <CalendarIcon className="w-3 h-3 mr-1 text-coral-500" />
-                          <span>{new Date(event.event_date).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          onFeatureClick('my-events');
-                          if (window.innerWidth < 1024) {
-                            onToggle();
-                          }
-                        }}
-                        className="text-coral-600 hover:text-coral-700 text-xs"
-                      >
-                        View
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Planning Tools Section */}
-        <div className="p-3 md:p-4 border-t border-gray-200">
-          <h3 className="font-semibold text-gray-700 mb-2 md:mb-3 text-sm md:text-base">Planning Tools</h3>
-          {planningTools.map((item) => (
-            <Card
-              key={item.id}
-              className="cursor-pointer hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-r from-yellow-50 to-lime-50 hover:from-yellow-100 hover:to-lime-100 mb-2"
               onClick={() => handleItemClick(item.id)}
             >
               <CardContent className="p-2 md:p-3">
