@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { MainMenu } from './MainMenu';
 import { NewUserQuickStartGuide } from './dashboard/NewUserQuickStartGuide';
@@ -17,7 +16,8 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, Users, DollarSign, CheckSquare } from 'lucide-react';
+import { Calendar, Clock, CheckSquare, Users, Menu, DollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface DashboardProps {
   userId: string;
@@ -147,6 +147,29 @@ export const Dashboard = ({ userId }: DashboardProps) => {
     return user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
   };
 
+  const calculateDaysLeft = (eventDate: string) => {
+    const today = new Date();
+    const eventDay = new Date(eventDate);
+    const timeDiff = eventDay.getTime() - today.getTime();
+    const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return daysLeft;
+  };
+
+  const formatEventDate = (eventDate: string) => {
+    return new Date(eventDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const calculateProgress = () => {
+    const taskProgress = eventProgress.totalTasks > 0 ? (eventProgress.completedTasks / eventProgress.totalTasks) * 100 : 0;
+    const guestProgress = currentEvent?.expected_guests > 0 ? (eventProgress.confirmedGuests / currentEvent.expected_guests) * 100 : 0;
+    return Math.round((taskProgress + guestProgress) / 2);
+  };
+
   const renderFeature = () => {
     switch (activeFeature) {
       case 'my-events':
@@ -173,106 +196,128 @@ export const Dashboard = ({ userId }: DashboardProps) => {
         return <WhatsAppBulkMessagingPage onBack={() => setActiveFeature(null)} />;
       default:
         return (
-          <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50">
-            <div className="container mx-auto px-4 py-8">
-              {/* Header */}
-              <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold text-gray-800 mb-4 font-montserrat">
-                  Welcome to Eventify! ✨
-                </h1>
-                <p className="text-xl text-gray-600 font-montserrat">
-                  Hello {getUserDisplayName()}! Ready to plan something amazing?
-                </p>
+          <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50">
+            {/* Header */}
+            <div className="bg-white shadow-sm border-b border-orange-100">
+              <div className="flex items-center justify-between p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-2xl">🎉</span>
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold text-gray-800">Eventify</h1>
+                    <p className="text-sm text-gray-600">Plan with Confidence</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={toggleMainMenu}
+                  variant="ghost"
+                  size="sm"
+                  className="p-2 hover:bg-orange-100"
+                >
+                  <Menu className="w-6 h-6 text-gray-700" />
+                </Button>
               </div>
+            </div>
 
-              {/* Current Event Progress */}
-              {currentEvent && (
-                <div className="max-w-4xl mx-auto mb-8">
-                  <Card className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border-0">
-                    <CardHeader>
-                      <CardTitle className="flex items-center justify-between">
-                        <span className="text-2xl font-bold text-gray-800 flex items-center">
-                          <Calendar className="w-6 h-6 mr-2 text-coral-600" />
-                          {currentEvent.name}
-                        </span>
-                        <span className="text-sm text-gray-600">
-                          {new Date(currentEvent.event_date).toLocaleDateString()}
-                        </span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Task Progress */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="flex items-center text-sm font-medium text-gray-700">
-                              <CheckSquare className="w-4 h-4 mr-1 text-blue-600" />
-                              Tasks
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {eventProgress.completedTasks}/{eventProgress.totalTasks}
-                            </span>
-                          </div>
-                          <Progress 
-                            value={eventProgress.totalTasks > 0 ? (eventProgress.completedTasks / eventProgress.totalTasks) * 100 : 0} 
-                            className="h-2"
-                          />
+            <div className="container mx-auto px-4 py-6">
+              {currentEvent ? (
+                <div className="space-y-6">
+                  {/* Event Countdown Card */}
+                  <Card className="bg-gradient-to-r from-yellow-100 to-orange-100 border-0 shadow-lg">
+                    <CardContent className="p-6">
+                      <div className="text-center">
+                        <div className="text-4xl font-bold text-orange-600 mb-2">
+                          {calculateDaysLeft(currentEvent.event_date)} Days
                         </div>
-
-                        {/* Guest Confirmations */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="flex items-center text-sm font-medium text-gray-700">
-                              <Users className="w-4 h-4 mr-1 text-teal-600" />
-                              Confirmed Guests
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {eventProgress.confirmedGuests}/{currentEvent.expected_guests || 0}
-                            </span>
-                          </div>
-                          <Progress 
-                            value={currentEvent.expected_guests > 0 ? (eventProgress.confirmedGuests / currentEvent.expected_guests) * 100 : 0} 
-                            className="h-2"
-                          />
+                        <p className="text-gray-700 text-lg font-medium mb-1">Until {currentEvent.name}</p>
+                        <div className="flex items-center justify-center text-gray-600 text-sm">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {formatEventDate(currentEvent.event_date)}
                         </div>
-
-                        {/* Budget Usage */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="flex items-center text-sm font-medium text-gray-700">
-                              <DollarSign className="w-4 h-4 mr-1 text-green-600" />
-                              Budget
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              ${eventProgress.budgetUsed}/${currentEvent.budget || 0}
-                            </span>
+                        {currentEvent.event_time && (
+                          <div className="flex items-center justify-center text-gray-600 text-sm mt-1">
+                            <Clock className="w-4 h-4 mr-1" />
+                            {currentEvent.event_time}
                           </div>
-                          <Progress 
-                            value={currentEvent.budget > 0 ? (eventProgress.budgetUsed / currentEvent.budget) * 100 : 0} 
-                            className="h-2"
-                          />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Planning Progress Card */}
+                  <Card className="bg-white border-0 shadow-lg">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                          <CheckSquare className="w-5 h-5 mr-2 text-green-600" />
+                          Planning Progress
+                        </h3>
+                        <span className="text-2xl font-bold text-green-600">{calculateProgress()}%</span>
+                      </div>
+                      
+                      <Progress 
+                        value={calculateProgress()} 
+                        className="h-3 mb-4 bg-gray-200"
+                      />
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-lg">
+                          <div className="text-xl font-bold text-green-700">
+                            {eventProgress.completedTasks}/{eventProgress.totalTasks}
+                          </div>
+                          <p className="text-sm text-green-600">Tasks Done</p>
+                        </div>
+                        <div className="text-center p-3 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg">
+                          <div className="text-xl font-bold text-yellow-700 flex items-center justify-center">
+                            <Users className="w-4 h-4 mr-1" />
+                            {eventProgress.confirmedGuests}
+                          </div>
+                          <p className="text-sm text-yellow-600">Confirmed Guests</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                </div>
-              )}
 
-              {/* Simple Welcome Card for users without events */}
-              {!currentEvent && (
-                <div className="max-w-2xl mx-auto">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-lg border-0 text-center">
-                    <div className="text-6xl mb-4">🎉</div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4 font-montserrat">
-                      Let's Create Something Special
-                    </h2>
-                    <p className="text-gray-600 mb-6">
-                      Use the menu to access all your planning tools and manage your events.
-                    </p>
-                    <div className="text-sm text-gray-500">
-                      Click the menu button to get started!
-                    </div>
+                  {/* Quick Actions */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Button
+                      onClick={() => setActiveFeature('interactive-invite-guests')}
+                      className="h-16 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl shadow-lg"
+                    >
+                      <div className="text-center">
+                        <Users className="w-6 h-6 mx-auto mb-1" />
+                        <span className="font-medium">Invite Guests</span>
+                      </div>
+                    </Button>
+
+                    <Button
+                      onClick={() => setActiveFeature('enhanced-track-rsvps')}
+                      className="h-16 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl shadow-lg"
+                    >
+                      <div className="text-center">
+                        <CheckSquare className="w-6 h-6 mx-auto mb-1" />
+                        <span className="font-medium">Track RSVPs</span>
+                      </div>
+                    </Button>
                   </div>
+                </div>
+              ) : (
+                /* Welcome State */
+                <div className="text-center py-12">
+                  <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <span className="text-4xl">🎊</span>
+                  </div>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-4">Welcome to Eventify!</h2>
+                  <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                    Ready to plan something amazing? Create your first event to get started.
+                  </p>
+                  <Button
+                    onClick={handleCreateEvent}
+                    className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-8 py-3 rounded-full shadow-lg text-lg"
+                  >
+                    Create Your First Event
+                  </Button>
                 </div>
               )}
             </div>

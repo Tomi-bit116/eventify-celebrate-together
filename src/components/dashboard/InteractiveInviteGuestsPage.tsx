@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Users, Share2, Copy, Mail, MessageSquare, Link as LinkIcon, Send, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Users, Share2, Copy, Mail, MessageSquare, Link as LinkIcon, Send, RefreshCw, Instagram, Facebook } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -100,6 +100,18 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
     toast.success('SMS invitation opened! 📲');
   };
 
+  const shareViaInstagram = () => {
+    const message = `${customMessage}\n\n${invitationLink}`;
+    navigator.clipboard.writeText(message);
+    toast.success('Invitation copied! You can now paste it in Instagram Stories or DMs. 📋');
+  };
+
+  const shareViaFacebook = () => {
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(invitationLink)}`;
+    window.open(facebookUrl, '_blank', 'width=600,height=400');
+    toast.success('Shared on Facebook! 📘');
+  };
+
   const bulkShare = () => {
     const bulkMessage = `${customMessage}\n\n${invitationLink}`;
     navigator.clipboard.writeText(bulkMessage);
@@ -107,7 +119,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-coral-50 via-teal-50 to-emerald-50 p-4 font-montserrat">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50 p-4 font-montserrat">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center mb-6">
@@ -117,7 +129,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
           </Button>
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-800 flex items-center">
-              <Users className="w-8 h-8 mr-3 text-coral-600" />
+              <Users className="w-8 h-8 mr-3 text-orange-600" />
               Invite Guests
             </h1>
             <p className="text-gray-600 mt-2">Generate and share invitation links for {currentEvent?.name || 'your event'}</p>
@@ -157,9 +169,9 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
           {/* Generate Invitation Link */}
           <Card className="shadow-lg bg-white/90 backdrop-blur-sm border-0">
             <CardHeader>
-              <CardTitle className="flex items-center text-coral-700">
+              <CardTitle className="flex items-center text-orange-700">
                 <LinkIcon className="w-5 h-5 mr-2" />
-                Generate Invitation Link
+                Generate Invite Link
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -169,7 +181,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
                 <Button
                   onClick={generateInvitationLink}
                   disabled={isGenerating || !currentEvent}
-                  className="flex-1 bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white"
+                  className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white"
                 >
                   {isGenerating ? (
                     <div className="flex items-center">
@@ -177,7 +189,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
                       Generating...
                     </div>
                   ) : (
-                    'Generate Invitation Link'
+                    'Generate Invite Link'
                   )}
                 </Button>
                 
@@ -194,7 +206,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
               </div>
 
               {invitationLink && (
-                <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border border-green-200">
                   <Label className="text-sm font-medium text-gray-700">Your Invitation Link:</Label>
                   <div className="flex items-center space-x-2 mt-2">
                     <Input
@@ -205,7 +217,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
                     <Button
                       onClick={copyToClipboard}
                       size="sm"
-                      className="bg-teal-500 hover:bg-teal-600 text-white"
+                      className="bg-green-500 hover:bg-green-600 text-white"
                     >
                       <Copy className="w-4 h-4" />
                     </Button>
@@ -219,51 +231,69 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
           {/* Share Options */}
           <Card className="shadow-lg bg-white/90 backdrop-blur-sm border-0">
             <CardHeader>
-              <CardTitle className="flex items-center text-emerald-700">
+              <CardTitle className="flex items-center text-green-700">
                 <Share2 className="w-5 h-5 mr-2" />
                 Share Invitation
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-gray-600">Share your invitation link through various channels.</p>
+              <p className="text-gray-600">Share your invitation link through various platforms.</p>
               
-              <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
                 <Button
                   onClick={shareViaWhatsApp}
                   disabled={!invitationLink}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white justify-start"
+                  className="bg-green-500 hover:bg-green-600 text-white justify-center"
                 >
-                  <MessageSquare className="w-5 h-5 mr-2" />
-                  Share via WhatsApp
-                </Button>
-                
-                <Button
-                  onClick={shareViaEmail}
-                  disabled={!invitationLink}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white justify-start"
-                >
-                  <Mail className="w-5 h-5 mr-2" />
-                  Share via Email
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  WhatsApp
                 </Button>
                 
                 <Button
                   onClick={shareViaSMS}
                   disabled={!invitationLink}
-                  className="w-full bg-purple-500 hover:bg-purple-600 text-white justify-start"
+                  className="bg-blue-500 hover:bg-blue-600 text-white justify-center"
                 >
-                  <Send className="w-5 h-5 mr-2" />
-                  Share via SMS
+                  <Send className="w-4 h-4 mr-2" />
+                  SMS
                 </Button>
 
                 <Button
-                  onClick={bulkShare}
+                  onClick={shareViaEmail}
                   disabled={!invitationLink}
-                  className="w-full bg-gradient-to-r from-coral-500 to-pink-500 hover:from-coral-600 hover:to-pink-600 text-white justify-start"
+                  className="bg-purple-500 hover:bg-purple-600 text-white justify-center"
                 >
-                  <Copy className="w-5 h-5 mr-2" />
-                  Copy for Bulk Sharing
+                  <Mail className="w-4 h-4 mr-2" />
+                  Email
+                </Button>
+
+                <Button
+                  onClick={shareViaInstagram}
+                  disabled={!invitationLink}
+                  className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white justify-center"
+                >
+                  <Instagram className="w-4 h-4 mr-2" />
+                  Instagram
+                </Button>
+
+                <Button
+                  onClick={shareViaFacebook}
+                  disabled={!invitationLink}
+                  className="bg-blue-600 hover:bg-blue-700 text-white justify-center col-span-2"
+                >
+                  <Facebook className="w-4 h-4 mr-2" />
+                  Facebook
                 </Button>
               </div>
+
+              <Button
+                onClick={bulkShare}
+                disabled={!invitationLink}
+                className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
+              >
+                <Copy className="w-4 h-4 mr-2" />
+                Copy for Bulk Sharing
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -282,7 +312,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}
                 rows={4}
-                className="w-full mt-2 p-3 border rounded-lg text-sm resize-none focus:ring-2 focus:ring-coral-500 focus:border-coral-500"
+                className="w-full mt-2 p-3 border rounded-lg text-sm resize-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 placeholder="Add a personal message..."
               />
               <p className="text-xs text-gray-500 mt-2">This message will be included when you share the invitation.</p>
@@ -291,7 +321,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
         )}
 
         {/* Instructions */}
-        <Card className="mt-6 shadow-lg bg-gradient-to-r from-gold-50 to-yellow-50 border-0">
+        <Card className="mt-6 shadow-lg bg-gradient-to-r from-yellow-50 to-orange-50 border-0">
           <CardContent className="p-6">
             <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
               <span className="text-xl mr-2">💡</span>
@@ -300,7 +330,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
             <div className="space-y-2 text-sm text-gray-700">
               <p>1. <strong>Generate</strong> your unique invitation link above</p>
               <p>2. <strong>Customize</strong> your personal message</p>
-              <p>3. <strong>Share</strong> the link via WhatsApp, email, SMS, or bulk copy</p>
+              <p>3. <strong>Share</strong> the link via WhatsApp, SMS, Email, Instagram, or Facebook</p>
               <p>4. <strong>Guests click</strong> the link and fill out a simple RSVP form</p>
               <p>5. <strong>Track responses</strong> in real-time under "Track RSVPs"</p>
               <p>6. <strong>Registered guests</strong> will automatically appear in your event guest list</p>
