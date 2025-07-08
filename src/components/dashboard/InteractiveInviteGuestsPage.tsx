@@ -50,6 +50,7 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
       console.log('Generated invitation code:', data);
 
       if (data) {
+        // Use the correct URL format for RSVP
         const fullLink = `${window.location.origin}/rsvp/${data}`;
         setInvitationLink(fullLink);
         toast.success('Invitation link generated successfully! 🎉');
@@ -70,52 +71,96 @@ export const InteractiveInviteGuestsPage = ({ onBack, currentEvent }: Interactiv
   };
 
   const copyToClipboard = async () => {
+    if (!invitationLink) {
+      toast.error('Please generate a link first');
+      return;
+    }
+    
     try {
       await navigator.clipboard.writeText(invitationLink);
       toast.success('Link copied to clipboard! 📋');
     } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
       toast.error('Failed to copy link');
     }
   };
 
   const shareViaWhatsApp = () => {
+    if (!invitationLink) {
+      toast.error('Please generate a link first');
+      return;
+    }
+    
     const message = `${customMessage}\n\n${invitationLink}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
-    toast.success('Shared via WhatsApp! 📱');
+    toast.success('Opening WhatsApp! 📱');
   };
 
   const shareViaEmail = () => {
+    if (!invitationLink) {
+      toast.error('Please generate a link first');
+      return;
+    }
+    
     const subject = `Invitation to ${currentEvent?.name}`;
     const body = `${customMessage}\n\n${invitationLink}`;
     const emailUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(emailUrl);
-    toast.success('Email invitation opened! 📧');
+    toast.success('Opening email client! 📧');
   };
 
   const shareViaSMS = () => {
+    if (!invitationLink) {
+      toast.error('Please generate a link first');
+      return;
+    }
+    
     const message = `${customMessage}\n\n${invitationLink}`;
     const smsUrl = `sms:?body=${encodeURIComponent(message)}`;
     window.open(smsUrl);
-    toast.success('SMS invitation opened! 📲');
+    toast.success('Opening SMS! 📲');
   };
 
   const shareViaInstagram = () => {
+    if (!invitationLink) {
+      toast.error('Please generate a link first');
+      return;
+    }
+    
     const message = `${customMessage}\n\n${invitationLink}`;
-    navigator.clipboard.writeText(message);
-    toast.success('Invitation copied! You can now paste it in Instagram Stories or DMs. 📋');
+    navigator.clipboard.writeText(message).then(() => {
+      toast.success('Invitation copied! Open Instagram and paste in Stories or DMs. 📋');
+      // Open Instagram web version
+      window.open('https://www.instagram.com/', '_blank');
+    }).catch(() => {
+      toast.error('Failed to copy message');
+    });
   };
 
   const shareViaFacebook = () => {
+    if (!invitationLink) {
+      toast.error('Please generate a link first');
+      return;
+    }
+    
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(invitationLink)}`;
     window.open(facebookUrl, '_blank', 'width=600,height=400');
-    toast.success('Shared on Facebook! 📘');
+    toast.success('Opening Facebook! 📘');
   };
 
   const bulkShare = () => {
+    if (!invitationLink) {
+      toast.error('Please generate a link first');
+      return;
+    }
+    
     const bulkMessage = `${customMessage}\n\n${invitationLink}`;
-    navigator.clipboard.writeText(bulkMessage);
-    toast.success('Bulk invitation message copied! You can now paste this in your group chats or messaging apps. 📋');
+    navigator.clipboard.writeText(bulkMessage).then(() => {
+      toast.success('Bulk invitation message copied! You can now paste this in your group chats or messaging apps. 📋');
+    }).catch(() => {
+      toast.error('Failed to copy message');
+    });
   };
 
   return (

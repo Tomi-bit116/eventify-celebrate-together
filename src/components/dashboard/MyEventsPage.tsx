@@ -1,12 +1,14 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, Plus } from 'lucide-react';
+import { ArrowLeft, Calendar, Plus, Edit, Share2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { EventCard } from './EventCard';
 import { EmptyEventsState } from './EmptyEventsState';
+import { EditEventModal } from './EditEventModal';
+import { SocialShareModal } from './SocialShareModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface MyEventsPageProps {
@@ -31,6 +33,8 @@ export const MyEventsPage = ({ onBack, onEventSelect, onCreateEvent }: MyEventsP
   const { user } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [sharingEvent, setSharingEvent] = useState<Event | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -86,6 +90,22 @@ export const MyEventsPage = ({ onBack, onEventSelect, onCreateEvent }: MyEventsP
       console.error('Error deleting event:', error);
       toast.error('Failed to delete event');
     }
+  };
+
+  const handleEditEvent = (event: Event) => {
+    setEditingEvent(event);
+  };
+
+  const handleShareEvent = (event: Event) => {
+    setSharingEvent(event);
+  };
+
+  const handleEventUpdated = (updatedEvent: Event) => {
+    setEvents(events.map(event => 
+      event.id === updatedEvent.id ? updatedEvent : event
+    ));
+    setEditingEvent(null);
+    toast.success('Event updated successfully!');
   };
 
   if (loading) {
@@ -149,14 +169,32 @@ export const MyEventsPage = ({ onBack, onEventSelect, onCreateEvent }: MyEventsP
                         <span>{new Date(event.event_date).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEventSelect(event)}
-                      className="text-blue-600 hover:text-blue-700 text-xs"
-                    >
-                      Select
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditEvent(event)}
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                      >
+                        <Edit className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleShareEvent(event)}
+                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                      >
+                        <Share2 className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEventSelect(event)}
+                        className="text-purple-600 hover:text-purple-700 text-xs"
+                      >
+                        Select
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -170,16 +208,54 @@ export const MyEventsPage = ({ onBack, onEventSelect, onCreateEvent }: MyEventsP
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onEventSelect={onEventSelect}
-                onDeleteEvent={deleteEvent}
-              />
+              <div key={event.id} className="relative">
+                <EventCard
+                  event={event}
+                  onEventSelect={onEventSelect}
+                  onDeleteEvent={deleteEvent}
+                />
+                <div className="absolute top-2 right-2 flex space-x-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEditEvent(event)}
+                    className="bg-white/80 hover:bg-white text-blue-600 p-2 h-8 w-8"
+                  >
+                    <Edit className="w-3 h-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleShareEvent(event)}
+                    className="bg-white/80 hover:bg-white text-green-600 p-2 h-8 w-8"
+                  >
+                    <Share2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Edit Event Modal */}
+      {editingEvent && (
+        <EditEventModal
+          isOpen={!!editingEvent}
+          onClose={() => setEditingEvent(null)}
+          event={editingEvent}
+          onEventUpdated={handleEventUpdated}
+        />
+      )}
+
+      {/* Social Share Modal */}
+      {sharingEvent && (
+        <SocialShareModal
+          isOpen={!!sharingEvent}
+          onClose={() => setSharingEvent(null)}
+          event={sharingEvent}
+        />
+      )}
     </div>
   );
 };

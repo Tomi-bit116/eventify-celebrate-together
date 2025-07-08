@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, Clock, CheckSquare, Users, Menu, DollarSign } from 'lucide-react';
+import { Calendar, Clock, CheckSquare, Menu, Calendar as CalendarIcon, TrendingUp, ListTodo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface DashboardProps {
@@ -39,6 +39,7 @@ export const Dashboard = ({ userId }: DashboardProps) => {
     confirmedGuests: 0,
     budgetUsed: 0
   });
+  const [upcomingTasks, setUpcomingTasks] = useState<any[]>([]);
 
   useEffect(() => {
     if (user?.user_metadata?.is_new_user === true) {
@@ -170,6 +171,22 @@ export const Dashboard = ({ userId }: DashboardProps) => {
     return Math.round((taskProgress + guestProgress) / 2);
   };
 
+  const fetchUpcomingTasks = async (eventId: string) => {
+    if (!user) return;
+
+    try {
+      const { data: tasks } = await supabase.rpc('get_event_tasks', {
+        event_id_param: eventId,
+        user_id_param: user.id
+      });
+
+      const upcomingTasks = tasks?.filter(task => !task.completed && task.due_date).slice(0, 3) || [];
+      setUpcomingTasks(upcomingTasks);
+    } catch (error) {
+      console.error('Error fetching upcoming tasks:', error);
+    }
+  };
+
   const renderFeature = () => {
     switch (activeFeature) {
       case 'my-events':
@@ -250,7 +267,7 @@ export const Dashboard = ({ userId }: DashboardProps) => {
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-                          <CheckSquare className="w-5 h-5 mr-2 text-green-600" />
+                          <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
                           Planning Progress
                         </h3>
                         <span className="text-2xl font-bold text-green-600">{calculateProgress()}%</span>
@@ -261,46 +278,97 @@ export const Dashboard = ({ userId }: DashboardProps) => {
                         className="h-3 mb-4 bg-gray-200"
                       />
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-3 gap-3">
                         <div className="text-center p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-lg">
-                          <div className="text-xl font-bold text-green-700">
+                          <div className="text-lg font-bold text-green-700">
                             {eventProgress.completedTasks}/{eventProgress.totalTasks}
                           </div>
-                          <p className="text-sm text-green-600">Tasks Done</p>
+                          <p className="text-xs text-green-600">Tasks</p>
                         </div>
                         <div className="text-center p-3 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg">
-                          <div className="text-xl font-bold text-yellow-700 flex items-center justify-center">
-                            <Users className="w-4 h-4 mr-1" />
+                          <div className="text-lg font-bold text-yellow-700">
                             {eventProgress.confirmedGuests}
                           </div>
-                          <p className="text-sm text-yellow-600">Confirmed Guests</p>
+                          <p className="text-xs text-yellow-600">Guests</p>
+                        </div>
+                        <div className="text-center p-3 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg">
+                          <div className="text-lg font-bold text-orange-700">
+                            ${eventProgress.budgetUsed}
+                          </div>
+                          <p className="text-xs text-orange-600">Budget</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  {/* Quick Actions */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Button
-                      onClick={() => setActiveFeature('interactive-invite-guests')}
-                      className="h-16 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl shadow-lg"
-                    >
-                      <div className="text-center">
-                        <Users className="w-6 h-6 mx-auto mb-1" />
-                        <span className="font-medium">Invite Guests</span>
-                      </div>
-                    </Button>
+                  {/* Upcoming Tasks */}
+                  {upcomingTasks.length > 0 && (
+                    <Card className="bg-white border-0 shadow-lg">
+                      <CardHeader>
+                        <CardTitle className="flex items-center text-gray-800">
+                          <ListTodo className="w-5 h-5 mr-2 text-blue-600" />
+                          Upcoming Tasks
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {upcomingTasks.map((task) => (
+                            <div key={task.id} className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
+                              <div>
+                                <h4 className="font-medium text-gray-800 text-sm">{task.title}</h4>
+                                <p className="text-xs text-gray-600 flex items-center mt-1">
+                                  <CalendarIcon className="w-3 h-3 mr-1" />
+                                  Due: {new Date(task.due_date).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <div className={`px-2 py-1 rounded text-xs font-medium ${
+                                task.priority === 'high' ? 'bg-red-100 text-red-700' :
+                                task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-green-100 text-green-700'
+                              }`}>
+                                {task.priority}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
 
-                    <Button
-                      onClick={() => setActiveFeature('enhanced-track-rsvps')}
-                      className="h-16 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl shadow-lg"
-                    >
-                      <div className="text-center">
-                        <CheckSquare className="w-6 h-6 mx-auto mb-1" />
-                        <span className="font-medium">Track RSVPs</span>
+                  {/* Event Timeline */}
+                  <Card className="bg-white border-0 shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="flex items-center text-gray-800">
+                        <Clock className="w-5 h-5 mr-2 text-purple-600" />
+                        Event Timeline
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                          <div>
+                            <p className="font-medium text-gray-800">Event Created</p>
+                            <p className="text-xs text-gray-600">{new Date(currentEvent.created_at).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                          <div>
+                            <p className="font-medium text-gray-800">Planning In Progress</p>
+                            <p className="text-xs text-gray-600">Current phase</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
+                          <div>
+                            <p className="font-medium text-gray-800">Event Day</p>
+                            <p className="text-xs text-gray-600">{formatEventDate(currentEvent.event_date)}</p>
+                          </div>
+                        </div>
                       </div>
-                    </Button>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </div>
               ) : (
                 /* Welcome State */
